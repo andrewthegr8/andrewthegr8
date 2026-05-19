@@ -81,5 +81,5 @@ Led system-level design and integration for a 250-lb combat robot across mechani
 - Portfolio site: [index.html](index.html)
 - Harvester case study: [harvester.html](harvester.html)
 - Autonomous mobile robot documentation: [Read the Docs](https://term-project-me-405.readthedocs.io/en/latest/index.html)
-- Email: [amjones@outlook.com](mailto:amjones@outlook.com)
+- Email: [amjones@outlook.com](mailto:andrewmj@outlook.com)
 - LinkedIn: [linkedin.com/in/andrew-jones-aa05802b1](https://www.linkedin.com/in/andrew-jones-aa05802b1/)
