@@ -32,7 +32,7 @@
         </p>
         <div class="cta-row">
           <a class="btn primary" href="#controls">See the control system</a>
-          <a class="btn" href="3-DOF/FinalVideo.mp4" target="_blank" rel="noreferrer">Watch demo video</a>
+          <a class="btn" href="#demo">Watch demo video</a>
           <a class="btn" href="3-DOF/Project%20Final%20Report.pdf" target="_blank" rel="noreferrer">Read full report</a>
         </div>
         <div class="tags" style="margin-top: 14px">
@@ -193,12 +193,18 @@ def TargetDist(t, coeff):
         </article>
       </div>
 
-      <div class="panel" style="margin-top: 1rem;">
+      <div id="demo" class="panel" style="margin-top: 1rem;">
         <h3>Demo video</h3>
-        <video class="video" controls preload="metadata" poster="3-DOF/project_report_images/Project_Final_Report_page_009_image_01_xref_55.jpeg">
-          <source src="3-DOF/FinalVideo.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        <div class="video" style="position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;">
+          <iframe
+            src="https://www.youtube.com/embed/d2FOg7ZV2Aw"
+            title="3-DOF robotic harvester demo video"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0;">
+          </iframe>
+        </div>
         <p class="muted small">Full robot demonstration showing the coordinated multi-step harvesting sequence.</p>
       </div>
 
