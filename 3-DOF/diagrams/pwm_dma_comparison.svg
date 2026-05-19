@@ -40,25 +40,27 @@
 <rect x="50.0" y="112.0" width="350.0" height="276.0" rx="15.0" class="panel"/>
 <text x="225.0" y="145.0" class="label" text-anchor="middle">Original software PWM library</text>
 <text x="225.0" y="168.0" class="tiny" text-anchor="middle">Controller tuning could not produce reliable motor behavior</text>
-<text x="225.0" y="195.0" class="small" text-anchor="middle">Oscilloscope measurement</text>
-<text x="225.0" y="213.0" class="tiny" text-anchor="middle">commanded duty did not equal measured duty</text>
-<path d="M92,304 L92,224 L126,224 L126,304 L143,304 L143,224 L165,224 L165,304 L194,304 L194,224 L237,224 L237,304 L250,304 L250,224 L277,224 L277,304 L304,304 L304,224 L342,224 L342,304 L358,304" fill="none" stroke="#fb7185" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="225.0" y="340.0" class="tiny" text-anchor="middle">Mismatch explained the failed tuning response</text>
+<rect x="128" y="184" width="194" height="42" rx="14" fill="#111d2f" stroke="#334b6a" stroke-width="1.1"/>
+<text x="225.0" y="202.0" class="small" text-anchor="middle">Measured with oscilloscope</text>
+<text x="225.0" y="219.0" class="tiny" text-anchor="middle">actual duty differed from command</text>
+<path d="M92,318 L92,250 L126,250 L126,318 L143,318 L143,250 L165,250 L165,318 L194,318 L194,250 L237,250 L237,318 L250,318 L250,250 L277,250 L277,318 L304,318 L304,250 L342,250 L342,318 L358,318" fill="none" stroke="#fb7185" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="225.0" y="355.0" class="tiny" text-anchor="middle">Mismatch explained the failed tuning response</text>
 <rect x="500.0" y="112.0" width="350.0" height="276.0" rx="15.0" class="panel2"/>
 <text x="675.0" y="145.0" class="label" text-anchor="middle">pigpio hardware-timed PWM</text>
 <text x="675.0" y="168.0" class="tiny" text-anchor="middle">Library change produced the requested duty cycle</text>
-<text x="675.0" y="195.0" class="small" text-anchor="middle">Oscilloscope verification</text>
-<text x="675.0" y="213.0" class="tiny" text-anchor="middle">measured waveform matched command</text>
-<path d="M544,304 L544,304 L544,224 L571,224 L571,304 L587,304 L587,224 L614,224 L614,304 L630,304 L630,224 L657,224 L657,304 L673,304 L673,224 L700,224 L700,304 L716,304 L716,224 L743,224 L743,304 L759,304 L759,224 L786,224 L786,304 L806,304" fill="none" stroke="#86efac" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="675.0" y="340.0" class="tiny" text-anchor="middle">Verified PWM made tuning repeatable</text>
+<rect x="578" y="184" width="194" height="42" rx="14" fill="#112632" stroke="#2c6d73" stroke-width="1.1"/>
+<text x="675.0" y="202.0" class="small" text-anchor="middle">Verified on oscilloscope</text>
+<text x="675.0" y="219.0" class="tiny" text-anchor="middle">actual duty matched command</text>
+<path d="M544,318 L544,318 L544,250 L571,250 L571,318 L587,318 L587,250 L614,250 L614,318 L630,318 L630,250 L657,250 L657,318 L673,318 L673,250 L700,250 L700,318 L716,318 L716,250 L743,250 L743,318 L759,318 L759,250 L786,250 L786,318 L806,318" fill="none" stroke="#86efac" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="675.0" y="355.0" class="tiny" text-anchor="middle">Verified PWM made tuning repeatable</text>
 <g aria-label="library change"><path d="M418 245 H466 V226 L492 256 L466 286 V267 H418 Z" fill="#123c45" stroke="#5eead4" stroke-width="1.8" stroke-linejoin="round"/></g>
 <text x="455.0" y="328.0" class="tiny" text-anchor="middle">library change</text>
 <rect x="48.0" y="420.0" width="804.0" height="108.0" rx="15.0" class="panel"/>
 <text x="450.0" y="449.0" class="label" text-anchor="middle">Debugging sequence</text>
-<path d="M186 491 H205" class="arrow"/>
-<path d="M349 491 H368" class="arrow"/>
-<path d="M512 491 H531" class="arrow"/>
-<path d="M675 491 H694" class="arrow"/>
+<path d="M188 481 H211 L223 491 L211 501 H188 L198 491 Z" fill="#5eead4" opacity="0.9"/>
+<path d="M351 481 H374 L386 491 L374 501 H351 L361 491 Z" fill="#5eead4" opacity="0.9"/>
+<path d="M514 481 H537 L549 491 L537 501 H514 L524 491 Z" fill="#5eead4" opacity="0.9"/>
+<path d="M677 481 H700 L712 491 L700 501 H677 L687 491 Z" fill="#5eead4" opacity="0.9"/>
 <rect x="46" y="466" width="140" height="50" rx="16" class="chip"/>
 <circle cx="69" cy="491" r="13" fill="#5eead4"/>
 <text x="69.0" y="496.0" class="label" text-anchor="middle">1</text>

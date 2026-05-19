@@ -2,97 +2,84 @@
 
 **Robotics Engineer • Embedded Systems • Real-Time Control**
 
-> Building reliable autonomous systems through rigorous control design, embedded software optimization, and rapid iteration. Experienced with multi-microcontroller architectures, real-time operating systems, and closing the gap between theory and hardware.
-
----
+I build robotic systems that connect control theory, embedded software, sensors, and hardware debugging. My work focuses on reliable motion, real-time performance, and practical implementation on physical machines.
 
 ## Featured Projects
 
-### 1) Robot Visual Tracking and Communication System *(Master’s Thesis — In Progress)*
-- Designed a multi-microcontroller architecture: **Raspberry Pi → ESP32 → STM32** for real-time perception-to-control data flow.
-- Defined latency requirements from control constraints with a target of **< 30 ms**.
-- Implemented and profiled **SPI, UART, and ESP-NOW** to optimize end-to-end latency (**currently ~50 ms**).
-- Identified bottlenecks in the image capture/processing pipeline and developed optimization strategies.
-- Built Python-based real-time visualization tools for performance monitoring and debugging.
+### Autonomous Mobile Robot
 
-**Key Skills:** Distributed embedded systems, latency analysis, Python tooling, hardware integration
+Built and tuned a differential-drive Romi robot for fast, reliable autonomous course navigation. The project combined real-time embedded control, state estimation, sensor integration, telemetry tooling, and iterative controller tuning on physical hardware.
 
----
+- Developed STM32/MicroPython firmware for autonomous navigation using encoder, IMU, reflectance-array, bump, and proximity-sensor feedback.
+- Implemented observer-based state estimation for wheel motion, heading, and robot pose.
+- Designed heading and speed control logic for waypoint navigation, including speed reduction for large heading errors and controlled deceleration near targets.
+- Streamed Bluetooth telemetry to a PC interface for live monitoring of predicted versus actual wheel velocity, pose, heading, control signals, and path data.
+- Built logging and plotting tools that exported CSV data and generated run-analysis plots for velocity tracking, setpoint timing, and XY path performance.
+- Used iterative tuning and test data to reduce course completion time from roughly 30 seconds to roughly 15 seconds.
 
-### ⚙️ Autonomous Mobile Robot (2024)
-**Challenge:** Design a mobile robot that autonomously navigates a course faster than competing teams while maintaining stable control under sensor noise and model uncertainty.
+**Key skills:** autonomous navigation, state estimation, heading control, speed control, live telemetry, embedded optimization, sensor fusion
 
-**Approach:**
-- Developed real-time embedded controller in **MicroPython + STM32** with IMU, quadrature encoders, and IR proximity sensors
-- Designed state observer and model-based controller for robust autonomous navigation
-- Met strict **25 ms** real-time control deadline through profiling and optimization
-- **Achieved 2x speedup**: reduced completion time from ~30s to ~15s (fastest of 12 teams) via iterative control tuning
-
-**Key Skills:** Real-time control, state estimation, embedded optimization, sensor fusion
+[View the autonomous mobile robot documentation](https://term-project-me-405.readthedocs.io/en/latest/index.html)
 
 ---
 
-### 🤖 3-DOF Robotic Harvester System (Featured)
-**Challenge:** Build a 5-motor manipulator arm that executes a complex 24-waypoint task sequence with smooth, repeatable motion. The harvester had to smoothly pick, transport, and release objects—no jerky movements.
+### 3-DOF Robotic Harvester System
 
-**Approach:**
-- Implemented full control stack in **Python (Raspberry Pi)**: cubic spline trajectory generation, cascaded PI/PID motor controllers, real-time encoder feedback
-- Debugged motor instability via oscilloscope analysis; traced root cause to software-timed PWM
-- Switched to **DMA-based PWM** to eliminate jitter and stabilize closed-loop performance
-- Performed DH-parameter kinematic modeling and empirically tuned control gains for 5 heterogeneous motors (3 linear + 2 rotational)
+Built the control stack for a 5-motor manipulator that executed a 24-waypoint pick, transport, and release sequence with smooth, repeatable motion.
 
-**Result:** Deterministic 24-waypoint sequence with smooth 3-6s transitions, logged all telemetry to CSV for post-analysis
+- Implemented cubic-spline trajectory generation, cascaded PI/PID motor controllers, and real-time encoder feedback in Python on a Raspberry Pi.
+- Diagnosed motor behavior that could not be corrected through controller tuning alone.
+- Used an oscilloscope to compare requested PWM against the actual motor-control signal.
+- Identified a duty-cycle mismatch caused by the software-timed PWM library, switched libraries, verified the corrected signal, and deployed the fix.
+- Performed DH-parameter kinematic modeling and tuned control gains for heterogeneous linear and rotational actuators.
 
-**Key Skills:** Real-time embedded control, trajectory planning, hardware debugging, closed-loop system design
+**Result:** completed a deterministic 24-waypoint sequence with smooth transitions and CSV telemetry logging for post-run analysis.
 
-[→ View full case study with control flow diagrams](harvester.html)
+**Key skills:** embedded control, trajectory planning, oscilloscope debugging, PWM generation, closed-loop motor control
+
+[View the full harvester case study](harvester.html)
+
+---
+
+### Robot Visual Tracking and Communication System *(Master's Thesis — In Progress)*
+
+Designed a distributed embedded architecture for real-time perception-to-control data flow across a Raspberry Pi, ESP32, and STM32.
+
+- Defined latency targets from control-loop requirements, with an initial goal below 30 ms.
+- Implemented and profiled SPI, UART, and ESP-NOW communication paths.
+- Measured end-to-end latency and identified bottlenecks in image capture, processing, and packet transfer.
+- Built Python visualization tools for monitoring timing behavior during development.
+
+**Key skills:** distributed embedded systems, latency analysis, communication protocols, Python tooling, hardware integration
 
 ---
 
-### 🏆 Battle Bot Team Lead (250-lb Combat Robot)
-**Challenge:** Lead design and integration of a 250-pound autonomous combat robot across mechanical and electrical subsystems in a competitive team environment.
+### Battle Bot Team Lead — 250-lb Combat Robot
 
-**Approach:**
-- Owned system-level architecture and cross-functional coordination between 15+ team members
-- Conducted trade studies for drivetrain (speed vs. torque) and weapon (reliability vs. power) under weight/power budget constraints
-- Defined team vision, execution milestones, and manufacturing workflows
-- Improved design manufacturability through CAD validation and optimized machining sequences for complex components
+Led system-level design and integration for a 250-lb combat robot across mechanical, electrical, and manufacturing workstreams.
 
-**Result:** Delivered functional robot on schedule; competed in official BattleBots competition
+- Coordinated architecture and integration across a multidisciplinary team.
+- Evaluated drivetrain and weapon tradeoffs under weight, power, reliability, and manufacturability constraints.
+- Set execution milestones for design review, manufacturing, assembly, and testing.
+- Improved manufacturability through CAD review and machining-sequence planning.
 
-**Key Skills:** Systems engineering, team leadership, design tradeoffs, manufacturing process optimization
-
----
+**Key skills:** systems engineering, design tradeoffs, team leadership, manufacturing process planning
 
 ## Technical Focus
 
-| Domain | Technologies & Concepts |
-|--------|------------------------|
-| **Real-Time Control** | Embedded PID/PI loops, trajectory planning, state feedback, control gain tuning |
-| **Embedded Systems** | STM32, Raspberry Pi, MicroPython, bare-metal C, real-time constraints |
-| **Robotics** | Forward/inverse kinematics, DH parameters, encoder feedback, motor control, sensor fusion |
-| **Communication** | SPI, UART, ESP-NOW, GPIO timing, interrupt-driven I/O |
-| **Debugging & Profiling** | Oscilloscope analysis, latency profiling, CSV logging, Python visualization tools |
-| **Software** | Python, C, numpy/scipy, git version control |
+| Domain | Technologies and Concepts |
+|--------|---------------------------|
+| Real-Time Control | PID/PI loops, trajectory planning, state feedback, observer design, gain tuning |
+| Embedded Systems | STM32, Raspberry Pi, MicroPython, C, real-time constraints |
+| Robotics | Kinematics, encoder feedback, motor control, sensor fusion, autonomous navigation |
+| Communication | SPI, UART, ESP-NOW, GPIO timing, interrupt-driven I/O |
+| Debugging and Profiling | Oscilloscope analysis, latency profiling, CSV logging, Python visualization tools |
+| Software | Python, C, NumPy/SciPy, Git |
 
----
+## Links
 
-## Repository Structure
-
-```
-website/              # Portfolio site (GitHub Pages)
-├── harvester.html    # 3-DOF harvester case study with control flow diagrams
-├── index.html        # Portfolio home
-├── styles.css        # Shared styling
-└── 3-DOF/            # Project artifacts (PDFs, videos, images)
-```
-
-**To run locally:** This is a static site—open `index.html` in your browser or deploy via GitHub Pages.
-
----
-
-## Quick Links
-
-- **Case Studies**: [3-DOF Harvester Control System](harvester.html)
-- **Repository**: This GitHub Pages site
-- **Academic Work**: See project reports and presentations in individual case studies
+- Portfolio site: [index.html](index.html)
+- Harvester case study: [harvester.html](harvester.html)
+- Autonomous mobile robot documentation: [Read the Docs](https://term-project-me-405.readthedocs.io/en/latest/index.html)
+- Email: [amjones@outlook.com](mailto:amjones@outlook.com)
+- LinkedIn: [linkedin.com/in/andrew-jones-aa05802b1](https://www.linkedin.com/in/andrew-jones-aa05802b1/)

@@ -4,14 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Andrew Jones — Robotics Portfolio</title>
-  <meta name="description" content="Robotics portfolio: embedded systems, real-time control, and rapid iteration." />
+  <meta name="description" content="Andrew Jones robotics portfolio covering embedded systems, real-time control, autonomous mobile robots, and mechatronics projects." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
   <script defer src="site.js"></script>
 </head>
 <body>
   <header class="nav">
     <a class="brand" href="./">Andrew Jones</a>
-    <nav class="navlinks">
+    <nav class="navlinks" aria-label="Primary navigation">
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -21,39 +22,63 @@
     <section class="hero">
       <div class="hero-text">
         <h1>Robotics Engineer</h1>
-        <p class="subhead">Embedded Systems • Real-Time Control • Fast Iteration</p>
+        <p class="subhead">Embedded Systems • Real-Time Control • Mechatronics</p>
         <p class="lede">
-          I build reliable robots by combining controls, embedded software, and rigorous debugging.
-          This site highlights projects where I shipped systems under real constraints (timing, stability, safety).
+          I build robotic systems that connect control theory, embedded software, sensors, and hardware debugging.
+          My work focuses on reliable motion, real-time performance, and practical implementation on physical machines.
         </p>
         <div class="cta-row">
           <a class="btn primary" href="#projects">View projects</a>
-          <a class="btn" href="README.md">GitHub README</a>
+          <a class="btn" href="mailto:amjones@outlook.com">Contact me</a>
         </div>
       </div>
       <div class="hero-card">
-        <div class="pill">Currently featured</div>
-        <h2 class="card-title">3-DOF Robotic Harvester</h2>
-        <p class="card-body">Manipulator control + trajectory planning. Traced motor instability to PWM timing and fixed it with DMA-based PWM generation.</p>
-        <a class="btn small" href="harvester.html">Read the case study →</a>
+        <div class="pill">Featured project</div>
+        <h2 class="card-title">Autonomous Mobile Robot</h2>
+        <p class="card-body">
+          STM32/MicroPython Romi platform with observer-based state estimation, advanced speed and heading control,
+          Bluetooth telemetry, and a PC interface for live monitoring and post-run analysis.
+        </p>
+        <a class="btn small" href="https://term-project-me-405.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer">View documentation →</a>
       </div>
     </section>
 
     <section id="projects" class="section">
       <div class="section-head">
         <h2>Featured Robotics Projects</h2>
-        <p class="muted">Four projects from my README—one deep-dive per page. More coming soon.</p>
+        <p class="muted">Selected work in autonomous systems, embedded control, communication, and system integration.</p>
       </div>
 
       <div class="grid">
+        <article class="project featured-project">
+          <div class="project-top">
+            <h3>Autonomous Mobile Robot</h3>
+            <p class="muted">Autonomous navigation • Live telemetry • Speed and heading control</p>
+          </div>
+          <p>
+            Built and tuned a differential-drive Romi robot to complete an obstacle course quickly and reliably.
+            The system combined STM32/MicroPython firmware, encoder and IMU feedback, line sensing, waypoint navigation,
+            obstacle detection, and Bluetooth telemetry streamed to a PC interface for real-time monitoring, logging, and plotting.
+          </p>
+          <div class="tags">
+            <span>MicroPython</span><span>STM32</span><span>State Observer</span><span>Bluetooth Telemetry</span><span>Autonomous Navigation</span>
+          </div>
+          <a class="btn small" href="https://term-project-me-405.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer">View project documentation</a>
+        </article>
+
         <article class="project">
           <div class="project-top">
             <h3>3-DOF Robotic Harvester System</h3>
-            <p class="muted">Embedded control • DMA PWM • Kinematics</p>
+            <p class="muted">Embedded control • Trajectory planning • Hardware debugging</p>
           </div>
-          <p>Designed embedded control for a multi-motor manipulator with safety features and trajectory planning. Solved a real signal-stability issue using oscilloscope-driven debugging.</p>
+          <p>
+            Built the control stack for a multi-motor manipulator, including trajectory planning, encoder feedback,
+            and closed-loop motor control. When the robot could not achieve the commanded behavior through tuning alone,
+            I used an oscilloscope to compare requested PWM against the actual signal, identified a timing mismatch in the
+            software-timed PWM library, switched libraries, verified the duty cycle, and deployed the corrected controller.
+          </p>
           <div class="tags">
-            <span>STM32</span><span>PWM</span><span>DMA</span><span>Controls</span><span>Mechatronics</span>
+            <span>Raspberry Pi</span><span>PWM</span><span>DMA</span><span>Controls</span><span>Mechatronics</span>
           </div>
           <a class="btn small" href="harvester.html">Open case study</a>
         </article>
@@ -61,37 +86,31 @@
         <article class="project">
           <div class="project-top">
             <h3>Robot Visual Tracking & Communication</h3>
-            <p class="muted">Thesis (in progress)</p>
+            <p class="muted">Master's thesis • Distributed embedded systems</p>
           </div>
-          <p>Multi-microcontroller pipeline (Raspberry Pi → ESP32 → STM32) with profiling-driven latency optimization.</p>
+          <p>
+            Designed and profiled a Raspberry Pi, ESP32, and STM32 communication pipeline for real-time perception-to-control
+            data flow, with emphasis on latency measurement, protocol comparison, and hardware integration.
+          </p>
           <div class="tags">
-            <span>Latency</span><span>SPI/UART</span><span>ESP-NOW</span><span>Python tools</span>
+            <span>Raspberry Pi</span><span>ESP32</span><span>STM32</span><span>SPI/UART</span><span>ESP-NOW</span>
           </div>
-          <a class="btn small disabled" href="#" aria-disabled="true">Page coming soon</a>
-        </article>
-
-        <article class="project">
-          <div class="project-top">
-            <h3>Autonomous Mobile Robot</h3>
-            <p class="muted">Real-time control</p>
-          </div>
-          <p>Observer-based state estimation and model-based control tuned to meet a 25 ms loop constraint.</p>
-          <div class="tags">
-            <span>MicroPython</span><span>STM32</span><span>IMU</span><span>Estimation</span>
-          </div>
-          <a class="btn small disabled" href="#" aria-disabled="true">Page coming soon</a>
+          <a class="btn small disabled" href="#" aria-disabled="true">Case study in progress</a>
         </article>
 
         <article class="project">
           <div class="project-top">
             <h3>Battle Bot Team Lead</h3>
-            <p class="muted">System integration</p>
+            <p class="muted">Systems engineering • Manufacturing • Team leadership</p>
           </div>
-          <p>Led system-level design and integration across mechanical and electrical subsystems for a 250-lb combat robot.</p>
+          <p>
+            Led system-level design and integration for a 250-lb combat robot, coordinating mechanical and electrical
+            subsystems, design tradeoffs, manufacturing planning, and final assembly for competition.
+          </p>
           <div class="tags">
             <span>Leadership</span><span>Integration</span><span>DFM</span><span>Trade studies</span>
           </div>
-          <a class="btn small disabled" href="#" aria-disabled="true">Page coming soon</a>
+          <a class="btn small disabled" href="#" aria-disabled="true">Case study in progress</a>
         </article>
       </div>
     </section>
@@ -99,11 +118,11 @@
     <section id="contact" class="section">
       <div class="section-head">
         <h2>Contact</h2>
-        <p class="muted">Add your preferred links (LinkedIn, email) once you’re ready.</p>
+        <p class="muted">I'm available to discuss robotics, embedded systems, and controls work.</p>
       </div>
       <div class="contact">
-        <div class="contact-row"><span class="label">LinkedIn</span><span class="muted">(add link)</span></div>
-        <div class="contact-row"><span class="label">Email</span><span class="muted">(add email)</span></div>
+        <div class="contact-row"><span class="label">Email</span><a href="mailto:amjones@outlook.com">amjones@outlook.com</a></div>
+        <div class="contact-row"><span class="label">LinkedIn</span><a href="https://www.linkedin.com/in/andrew-jones-aa05802b1/" target="_blank" rel="noopener noreferrer">linkedin.com/in/andrew-jones-aa05802b1</a></div>
       </div>
     </section>
   </main>
