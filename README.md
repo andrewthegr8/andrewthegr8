@@ -1,4 +1,4 @@
-<h1 align="center">Andrew Gomez</h1>
+<h1 align="center">Andrew Jones</h1>
 <p align="center">
   Robotics Engineer • Embedded Systems • Real-Time Control
 </p>
