@@ -35,31 +35,53 @@
     </marker>
   </defs>
   <rect class="bg" width="100%" height="100%" rx="18"/>
-<text x="450.0" y="42.0" class="title" text-anchor="middle">PWM Timing Problem and Fix</text>
-<text x="450.0" y="66.0" class="subtitle" text-anchor="middle">Hardware-timed PWM made the closed-loop response repeatable</text>
-<rect x="50.0" y="112.0" width="350.0" height="270.0" rx="15.0" class="panel"/>
-<text x="225.0" y="145.0" class="label" text-anchor="middle">Software-timed PWM</text>
-<text x="225.0" y="168.0" class="tiny" text-anchor="middle">Pulse edges vary with OS scheduling</text>
-<path d="M78,302 L78,302 L78,222 L109,222 L109,302 L127,302 L127,222 L170,222 L170,302 L183,302 L183,222 L210,222 L210,302 L232,302 L232,222 L271,222 L271,302 L282,302 L282,222 L314,222 L314,302 L332,302 L332,222 L377,222 L377,302 L391,302 L391,222 L419,222 L419,302 " fill="none" stroke="#fb7185" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="225.0" y="348.0" class="tiny" text-anchor="middle">Variable edge timing destabilizes the control loop</text>
-<rect x="500.0" y="112.0" width="350.0" height="270.0" rx="15.0" class="panel2"/>
-<text x="675.0" y="145.0" class="label" text-anchor="middle">Hardware-timed PWM</text>
-<text x="675.0" y="168.0" class="tiny" text-anchor="middle">DMA/timer pulses independent of CPU load</text>
-<path d="M533,302 L533,302 L533,222 L567,222 L567,302 L589,302 L589,222 L623,222 L623,302 L645,302 L645,222 L679,222 L679,302 L701,302 L701,222 L735,222 L735,302 L757,302 L757,222 L791,222 L791,302 L813,302 L813,222 L847,222 L847,302 " fill="none" stroke="#86efac" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="675.0" y="348.0" class="tiny" text-anchor="middle">Consistent pulse timing produces repeatable motion</text>
-<path class="arrowCyan" d="M414,247 C440,220 462,220 488,247"/>
-<text x="451.0" y="213.0" class="cyan" text-anchor="middle">hardware-timed output</text>
-<rect x="110.0" y="425.0" width="680.0" height="82.0" rx="15.0" class="panel"/>
-<text x="450.0" y="454.0" class="label" text-anchor="middle">Debugging path</text>
-<rect x="109" y="468" width="130" height="25" rx="12" class="chip"/>
-<text x="174.0" y="486.0" class="tiny" text-anchor="middle">Measure jitter</text>
-<rect x="273" y="468" width="130" height="25" rx="12" class="chip"/>
-<text x="338.0" y="486.0" class="tiny" text-anchor="middle">Find timing issue</text>
-<rect x="455" y="468" width="130" height="25" rx="12" class="chip"/>
-<text x="520.0" y="486.0" class="tiny" text-anchor="middle">Use pigpio hardware timing</text>
-<rect x="638" y="468" width="130" height="25" rx="12" class="chip"/>
-<text x="703.0" y="486.0" class="tiny" text-anchor="middle">Stabilize motion</text>
-<path class="arrow" d="M240,480 L270,480"/>
-<path class="arrow" d="M405,480 L445,480"/>
-<path class="arrow" d="M586,480 L638,480"/>
+<text x="450.0" y="42.0" class="title" text-anchor="middle">PWM Duty-Cycle Debugging</text>
+<text x="450.0" y="66.0" class="subtitle" text-anchor="middle">Oscilloscope testing showed the software PWM output did not match the commanded duty cycle</text>
+<rect x="50.0" y="112.0" width="350.0" height="276.0" rx="15.0" class="panel"/>
+<text x="225.0" y="145.0" class="label" text-anchor="middle">Original software PWM library</text>
+<text x="225.0" y="168.0" class="tiny" text-anchor="middle">Controller tuning could not produce reliable motor behavior</text>
+<text x="225.0" y="195.0" class="small" text-anchor="middle">Oscilloscope measurement</text>
+<text x="225.0" y="213.0" class="tiny" text-anchor="middle">commanded duty did not equal measured duty</text>
+<path d="M92,304 L92,224 L126,224 L126,304 L143,304 L143,224 L165,224 L165,304 L194,304 L194,224 L237,224 L237,304 L250,304 L250,224 L277,224 L277,304 L304,304 L304,224 L342,224 L342,304 L358,304" fill="none" stroke="#fb7185" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="225.0" y="340.0" class="tiny" text-anchor="middle">Mismatch explained the failed tuning response</text>
+<rect x="500.0" y="112.0" width="350.0" height="276.0" rx="15.0" class="panel2"/>
+<text x="675.0" y="145.0" class="label" text-anchor="middle">pigpio hardware-timed PWM</text>
+<text x="675.0" y="168.0" class="tiny" text-anchor="middle">Library change produced the requested duty cycle</text>
+<text x="675.0" y="195.0" class="small" text-anchor="middle">Oscilloscope verification</text>
+<text x="675.0" y="213.0" class="tiny" text-anchor="middle">measured waveform matched command</text>
+<path d="M544,304 L544,304 L544,224 L571,224 L571,304 L587,304 L587,224 L614,224 L614,304 L630,304 L630,224 L657,224 L657,304 L673,304 L673,224 L700,224 L700,304 L716,304 L716,224 L743,224 L743,304 L759,304 L759,224 L786,224 L786,304 L806,304" fill="none" stroke="#86efac" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="675.0" y="340.0" class="tiny" text-anchor="middle">Verified PWM made tuning repeatable</text>
+<g aria-label="library change"><path d="M418 245 H466 V226 L492 256 L466 286 V267 H418 Z" fill="#123c45" stroke="#5eead4" stroke-width="1.8" stroke-linejoin="round"/></g>
+<text x="455.0" y="328.0" class="tiny" text-anchor="middle">library change</text>
+<rect x="48.0" y="420.0" width="804.0" height="108.0" rx="15.0" class="panel"/>
+<text x="450.0" y="449.0" class="label" text-anchor="middle">Debugging sequence</text>
+<path d="M186 491 H205" class="arrow"/>
+<path d="M349 491 H368" class="arrow"/>
+<path d="M512 491 H531" class="arrow"/>
+<path d="M675 491 H694" class="arrow"/>
+<rect x="46" y="466" width="140" height="50" rx="16" class="chip"/>
+<circle cx="69" cy="491" r="13" fill="#5eead4"/>
+<text x="69.0" y="496.0" class="label" text-anchor="middle">1</text>
+<text x="130.0" y="486.0" class="tiny" text-anchor="middle">Tune controllers</text>
+<text x="130.0" y="502.0" class="tiny" text-anchor="middle">behavior still wrong</text>
+<rect x="209" y="466" width="140" height="50" rx="16" class="chip"/>
+<circle cx="232" cy="491" r="13" fill="#5eead4"/>
+<text x="232.0" y="496.0" class="label" text-anchor="middle">2</text>
+<text x="293.0" y="486.0" class="tiny" text-anchor="middle">Probe PWM with</text>
+<text x="293.0" y="502.0" class="tiny" text-anchor="middle">oscilloscope</text>
+<rect x="372" y="466" width="140" height="50" rx="16" class="chip"/>
+<circle cx="395" cy="491" r="13" fill="#5eead4"/>
+<text x="395.0" y="496.0" class="label" text-anchor="middle">3</text>
+<text x="456.0" y="486.0" class="tiny" text-anchor="middle">Identify duty-cycle</text>
+<text x="456.0" y="502.0" class="tiny" text-anchor="middle">mismatch</text>
+<rect x="535" y="466" width="140" height="50" rx="16" class="chip"/>
+<circle cx="558" cy="491" r="13" fill="#5eead4"/>
+<text x="558.0" y="496.0" class="label" text-anchor="middle">4</text>
+<text x="619.0" y="486.0" class="tiny" text-anchor="middle">Switch PWM</text>
+<text x="619.0" y="502.0" class="tiny" text-anchor="middle">library</text>
+<rect x="698" y="466" width="140" height="50" rx="16" class="chip"/>
+<circle cx="721" cy="491" r="13" fill="#5eead4"/>
+<text x="721.0" y="496.0" class="label" text-anchor="middle">5</text>
+<text x="782.0" y="486.0" class="tiny" text-anchor="middle">Verify waveform</text>
+<text x="782.0" y="502.0" class="tiny" text-anchor="middle">then deploy</text>
 </svg>
