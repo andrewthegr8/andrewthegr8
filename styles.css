@@ -44,7 +44,7 @@ a:hover{ text-decoration: underline; }
 }
 .brand{ font-weight: 700; letter-spacing: .2px; }
 .navlinks{ display: flex; gap: 14px; }
-.navlinks a{ color: var(--muted); }
+.navlinks a{ color: var(--text); }
 .navlinks a:hover{ color: var(--text); text-decoration: none; }
 
 main{ max-width: 1100px; margin: 0 auto; padding: 26px 20px 80px; }
@@ -441,3 +441,37 @@ pre.code-snippet {
 
   .role-item { grid-template-columns: 1fr; }
 }
+/* Clickable project cards */
+.project-link,
+.hero-card-link {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.project-link:hover,
+.project-link:focus-visible,
+.hero-card-link:hover,
+.hero-card-link:focus-visible {
+  transform: translateY(-6px);
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  outline: none;
+  text-decoration: none;
+}
+
+.project-link:hover *,
+.project-link:focus-visible *,
+.hero-card-link:hover *,
+.hero-card-link:focus-visible * {
+  text-decoration: none;
+}
+
+.project-link .btn,
+.hero-card-link .btn {
+  pointer-events: none;
+}
+

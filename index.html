@@ -3,36 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Andrew Jones — Robotics Engineer</title>
+  <title>Andrew Jones — Robotics Portfolio</title>
   <meta name="description" content="Andrew Jones robotics portfolio covering embedded systems, real-time control, autonomous mobile robots, and mechatronics projects." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    .project-link,
-    .hero-card-link {
-      color: inherit;
-      text-decoration: none;
-      display: block;
-      cursor: pointer;
-      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-    }
-
-    .project-link:hover,
-    .project-link:focus-visible,
-    .hero-card-link:hover,
-    .hero-card-link:focus-visible {
-      transform: translateY(-6px);
-      border-color: rgba(255, 255, 255, 0.28);
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
-      outline: none;
-    }
-
-    .project-link .btn,
-    .hero-card-link .btn {
-      pointer-events: none;
-    }
-  </style>
   <script defer src="site.js"></script>
 </head>
 <body>
@@ -58,15 +32,14 @@
           <a class="btn" href="mailto:andrewmj@outlook.com">Contact me</a>
         </div>
       </div>
-      <a class="hero-card hero-card-link" href="https://term-project-me-405.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer" aria-label="View autonomous mobile robot documentation">
-        <div class="pill">Featured project</div>
-        <h2 class="card-title">Autonomous Mobile Robot</h2>
+      <div class="hero-card">
+        <div class="pill">Featured case study</div>
+        <h2 class="card-title">3-DOF Robotic Harvester</h2>
         <p class="card-body">
-          STM32/MicroPython Romi platform with observer-based state estimation, advanced speed and heading control,
-          Bluetooth telemetry, and a PC interface for live monitoring and post-run analysis.
+          Manipulator control, trajectory generation, and oscilloscope-based PWM debugging for a multi-motor robotic system.
         </p>
-        <span class="btn small">View documentation →</span>
-      </a>
+        <a class="btn small" href="harvester.html">Read the case study →</a>
+      </div>
     </section>
 
     <section id="projects" class="section">
@@ -76,23 +49,7 @@
       </div>
 
       <div class="grid">
-        <a class="project featured-project project-link" href="https://term-project-me-405.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer" aria-label="View autonomous mobile robot documentation">
-          <div class="project-top">
-            <h3>Autonomous Mobile Robot</h3>
-            <p class="muted">Autonomous navigation • Live telemetry • Speed and heading control</p>
-          </div>
-          <p>
-            Built and tuned a differential-drive Romi robot to complete an obstacle course quickly and reliably.
-            The system combined STM32/MicroPython firmware, encoder and IMU feedback, line sensing, waypoint navigation,
-            obstacle detection, and Bluetooth telemetry streamed to a PC interface for real-time monitoring, logging, and plotting.
-          </p>
-          <div class="tags">
-            <span>MicroPython</span><span>STM32</span><span>State Observer</span><span>Bluetooth Telemetry</span><span>Autonomous Navigation</span>
-          </div>
-          <span class="btn small">View project documentation</span>
-        </a>
-
-        <a class="project project-link" href="harvester.html" aria-label="Open 3-DOF robotic harvester case study">
+        <article class="project">
           <div class="project-top">
             <h3>3-DOF Robotic Harvester System</h3>
             <p class="muted">Embedded control • Trajectory planning • Hardware debugging</p>
@@ -106,8 +63,24 @@
           <div class="tags">
             <span>Raspberry Pi</span><span>PWM</span><span>DMA</span><span>Controls</span><span>Mechatronics</span>
           </div>
-          <span class="btn small">Open case study</span>
-        </a>
+          <a class="btn small" href="harvester.html">Open case study</a>
+        </article>
+
+        <article class="project">
+          <div class="project-top">
+            <h3>Autonomous Mobile Robot</h3>
+            <p class="muted">Real-time control • State estimation • Embedded optimization</p>
+          </div>
+          <p>
+            Developed an autonomous mobile robot using MicroPython and STM32 hardware, with IMU, encoder, and proximity
+            sensor feedback. The controller used observer-based state estimation and model-based control while meeting a
+            25 ms loop deadline.
+          </p>
+          <div class="tags">
+            <span>MicroPython</span><span>STM32</span><span>IMU</span><span>Encoders</span><span>Estimation</span>
+          </div>
+          <a class="btn small" href="https://term-project-me-405.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer">View project documentation</a>
+        </article>
 
         <article class="project">
           <div class="project-top">
