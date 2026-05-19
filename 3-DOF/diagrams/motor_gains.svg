@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .header { fill: #2c3e50; font-weight: bold; }
+      .data { fill: #34495e; }
+      .title { fill: #1a1a1a; font-size: 16px; font-weight: bold; }
+      .cell { font-family: Arial, sans-serif; font-size: 12px; }
+      .border { fill: none; stroke: #bdc3c7; stroke-width: 1; }
+    </style>
+  </defs>
+  
+  <text x="300" y="25" text-anchor="middle" class="title cell">Empirically Tuned Control Gains</text>
+  
+  <!-- Table Header -->
+  <rect x="10" y="40" width="580" height="30" class="border"/>
+  <rect x="10" y="40" width="580" height="30" fill="#ecf0f1" class="header"/>
+  
+  <text x="20" y="62" class="header cell">Motor</text>
+  <text x="110" y="62" class="header cell">Type</text>
+  <text x="200" y="62" class="header cell">Kp</text>
+  <text x="280" y="62" class="header cell">Ki</text>
+  <text x="360" y="62" class="header cell">Kd</text>
+  <text x="440" y="62" class="header cell">Controller</text>
+  
+  <!-- Rows -->
+  <g>
+    <rect x="10" y="70" width="580" height="28" class="border"/>
+    <text x="20" y="91" class="data cell">Motor 1</text>
+    <text x="110" y="91" class="data cell">X-axis (linear)</text>
+    <text x="200" y="91" class="data cell">500</text>
+    <text x="280" y="91" class="data cell">10</text>
+    <text x="360" y="91" class="data cell">—</text>
+    <text x="440" y="91" class="data cell">PI</text>
+  </g>
+  
+  <g>
+    <rect x="10" y="98" width="580" height="28" class="border"/>
+    <text x="20" y="119" class="data cell">Motor 2,3</text>
+    <text x="110" y="119" class="data cell">Y-axis (linear)</text>
+    <text x="200" y="119" class="data cell">500</text>
+    <text x="280" y="119" class="data cell">10</text>
+    <text x="360" y="119" class="data cell">—</text>
+    <text x="440" y="119" class="data cell">PI</text>
+  </g>
+  
+  <g>
+    <rect x="10" y="126" width="580" height="28" class="border"/>
+    <text x="20" y="147" class="data cell">Motor 4</text>
+    <text x="110" y="147" class="data cell">Rotation</text>
+    <text x="200" y="147" class="data cell">0.1</text>
+    <text x="280" y="147" class="data cell">2</text>
+    <text x="360" y="147" class="data cell">0.01</text>
+    <text x="440" y="147" class="data cell">PID</text>
+  </g>
+  
+  <g>
+    <rect x="10" y="154" width="580" height="28" class="border"/>
+    <text x="20" y="175" class="data cell">Motor 5</text>
+    <text x="110" y="175" class="data cell">Gripper</text>
+    <text x="200" y="175" class="data cell">10</text>
+    <text x="280" y="175" class="data cell">0.25</text>
+    <text x="360" y="175" class="data cell">0</text>
+    <text x="440" y="175" class="data cell">PI</text>
+  </g>
+  
+  <text x="20" y="220" class="cell" font-style="italic" fill="#7f8c8d">
+    Tuned empirically via step response testing on physical hardware.
+  </text>
+  <text x="20" y="240" class="cell" font-style="italic" fill="#7f8c8d">
+    Linear motors (1-3) use identical gains; rotation motors scaled for different dynamics.
+  </text>
+</svg>
