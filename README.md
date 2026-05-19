@@ -6,7 +6,7 @@ I build robotic systems that connect control theory, embedded software, sensors,
 
 ## Featured Projects
 
-### Autonomous Mobile Robot (2024)
+### Autonomous Mobile Robot
 
 Built and tuned a differential-drive Romi robot for fast, reliable autonomous course navigation. The project combined real-time embedded control, state estimation, sensor integration, telemetry tooling, and iterative controller tuning on physical hardware.
 
@@ -78,12 +78,8 @@ Led system-level design and integration for a 250-lb combat robot across mechani
 
 ## Links
 
-- Portfolio site: [index.html](index.html)
-- Harvester case study: [harvester.html](harvester.html)
+- [Portfolio site](index.html)
+- [Harvester case study](harvester.html)
 - Autonomous mobile robot documentation: [Read the Docs](https://term-project-me-405.readthedocs.io/en/latest/index.html)
 - Email: [andrewmj@outlook.com](mailto:andrewmj@outlook.com)
 - LinkedIn: [linkedin.com/in/andrew-jones-aa05802b1](https://www.linkedin.com/in/andrew-jones-aa05802b1/)
-
-## Local Preview
-
-This is a static portfolio site. Open `index.html` in a browser or serve the folder with a local static server before publishing with GitHub Pages.
