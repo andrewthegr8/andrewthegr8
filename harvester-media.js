@@ -2,6 +2,7 @@
   Client-side media extraction:
   - PDF pages rendered via pdf.js
   - PPTX images extracted by unzipping the .pptx (a zip) via JSZip and reading ppt/media/*
+  Test
 */
 
 function $(id) { return document.getElementById(id); }

@@ -77,83 +77,143 @@
     <section id="media" class="section">
       <div class="section-head">
         <h2>Control implementation & architecture</h2>
-        <p class="muted">From trajectory planning to closed-loop motor control, here's the software strategy.</p>
+        <p class="muted">From waypoints to synchronized 5-motor motion: here's the software running on the Raspberry Pi.</p>
       </div>
 
       <div class="panel">
-        <h3>Demo video</h3>
+        <h3>Real-world demo</h3>
         <video class="video" controls preload="metadata">
           <source src="3-DOF/FinalVideo.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        <p class="muted small">Complete 24-waypoint sequence showing smooth multi-motor coordination in action.</p>
+        <p class="muted small">Complete 24-waypoint harvesting sequence with smooth multi-motor coordination.</p>
       </div>
 
       <div class="panel">
-        <h3>Trajectory generation: cubic spline interpolation</h3>
-        <p class="muted small">Core algorithm for smooth paths between waypoints with zero velocity endpoints.</p>
-        <div class="gallery">
-          <figure>
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_007_image_02_xref_48.png" alt="Trajectory control algorithm block diagram" />
-            <figcaption>Trajectory control loop: spline generation → encoder feedback → error correction</figcaption>
-          </figure>
-          <figure>
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_013_image_01_xref_92.png" alt="Trajectory tracking performance graph" />
-            <figcaption>Real-world trajectory tracking: desired vs. actual joint positions showing spline effectiveness</figcaption>
-          </figure>
+        <h3>Control flow: from waypoints to motion</h3>
+        <p class="muted small">How the 5ms control loop orchestrates trajectory generation, feedback, and motor actuation.</p>
+        <div style="background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 12px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; color: var(--muted); overflow-x: auto;">
+          <pre style="margin: 0;">
+<span style="color: var(--accent);">// Core 5ms real-time control loop</span>
+for each waypoint in sequence:
+  Generate cubic spline coefficients (smooth path)
+  
+  LOOP until waypoint reached:
+    ┌─ Motor 1 (X-axis linear):
+    │  • Read encoder → compute distance traveled
+    │  • Compare: desired (from spline) vs actual (from encoder)
+    │  • PI controller: error → PWM output (0-100%)
+    │  └─ Update motor PWM
+    │
+    ├─ Motor 2,3 (Y-axis linear): Same PI loop, shared gains
+    │
+    ├─ Motor 4 (Rotation):
+    │  • PID control (derivative term for stability)
+    │  • Tuned differently: lighter rotational load
+    │  └─ Update motor PWM
+    │
+    └─ Motor 5 (End-effector gripper):
+       • Direct position hold via PID
+       └─ Update motor PWM
+    
+    Accumulate error for integral term
+    Log telemetry to CSV
+    Sleep 5ms → repeat
+          </pre>
         </div>
       </div>
 
       <div class="panel">
-        <h3>Mechanical design & kinematic model</h3>
-        <p class="muted small">The platform the control software runs on: 5 motors, DH-parameterized kinematics.</p>
-        <div class="gallery">
-          <figure>
+        <h3>Cubic spline trajectory generation</h3>
+        <p class="muted small">The math behind smooth acceleration: solving a 4×4 linear system to create continuous paths between waypoints.</p>
+        
+        <div style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start;">
+          <div style="background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px; font-size: 13px;">
+            <div style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">The Problem</div>
+            <p style="margin: 0; color: var(--muted); line-height: 1.6;">
+              Linear interpolation between waypoints creates <b>jerky motion</b>: acceleration jumps at each waypoint. Motors overshoot due to discontinuous commands.
+            </p>
+          </div>
+          <div style="background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px; font-size: 13px;">
+            <div style="color: var(--accent2); font-weight: 600; margin-bottom: 10px;">The Solution</div>
+            <p style="margin: 0; color: var(--muted); line-height: 1.6;">
+              3rd-order polynomial <b>cubic spline</b>: ensures zero velocity at waypoints and continuous acceleration. Real smooth paths.
+            </p>
+          </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 12px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; color: var(--muted); overflow-x: auto;">
+          <pre style="margin: 0;">
+<span style="color: var(--accent);">// Spline coefficient computation (GimmeCoeff)</span>
+Boundary conditions: Start at pos₀, End at pos_f, zero velocity at both
+Cubic equation: p(t) = c₀ + c₁·t + c₂·t² + c₃·t³
+
+System of equations (4×4 linear):
+  p(0) = pos₀           →  c₀ = pos₀
+  ṗ(0) = 0              →  c₁ = 0
+  p(T) = pos_f          →  c₀ + c₁·T + c₂·T² + c₃·T³ = pos_f
+  ṗ(T) = 0              →  c₁ + 2·c₂·T + 3·c₃·T² = 0
+
+Solve via numpy.linalg.solve(A, b) for c₀, c₁, c₂, c₃
+
+<span style="color: var(--accent);">// Real-time trajectory evaluation</span>
+Every 5ms: desired_pos = TargetDist(elapsed_time, coeff)
+          </pre>
+        </div>
+
+        <p style="margin-top: 12px; color: var(--muted); font-size: 13px;"><b>Result:</b> 24 waypoint transitions, each with continuous acceleration. System response is predictable and tunable.</p>
+      </div>
+
+      <div class="panel">
+        <h3>System overview: mechanical & electrical</h3>
+        <p class="muted small">The hardware platform: 5 motors, encoders, and kinematic structure.</p>
+        <div class="gallery-grid">
+          <div class="gallery-item">
             <img src="3-DOF/project_report_images/Project_Final_Report_page_008_image_01_xref_51.png" alt="Full 3-DOF harvester assembly" />
-            <figcaption>Mechanical system: 3-DOF arm (xyz positioning) + 2-axis gripper end-effector</figcaption>
-          </figure>
-          <figure>
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_007_image_01_xref_47.png" alt="DH parameter reference frame diagram" />
-            <figcaption>DH parameter reference frames used for forward kinematics mapping</figcaption>
-          </figure>
-          <figure>
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_008_image_02_xref_52.png" alt="Individual joint design and motor mounting" />
-            <figcaption>Motor mounting and joint mechanics—controls the physical motion</figcaption>
-          </figure>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Motor control & hardware integration</h3>
-        <p class="muted small">Real-time encoder feedback, PWM actuation, and multi-motor synchronization.</p>
-        <div class="gallery">
-          <figure>
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_009_image_01_xref_55.jpeg" alt="Hardware test setup with oscilloscope" />
-            <figcaption>Test setup: 5 motors on encoders, PI controller monitoring real-time feedback</figcaption>
-          </figure>
-          <figure>
+            <div class="gallery-caption"><b>Mechanical assembly:</b> 3-DOF arm (X-Y-Z positioning) + 2-axis end-effector (rotate + grip)</div>
+          </div>
+          <div class="gallery-item">
             <img src="3-DOF/project_report_images/Project_Final_Report_page_010_image_01_xref_64.jpeg" alt="System electrical schematic" />
-            <figcaption>Control architecture: GPIO, PWM, encoder pins wired to motor drivers</figcaption>
-          </figure>
-          <figure>
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_019_image_01_xref_112.png" alt="PWM control signal output" />
-            <figcaption>PWM output signals from control loop—duty cycle modulates motor speed</figcaption>
-          </figure>
+            <div class="gallery-caption"><b>Control architecture:</b> Raspberry Pi GPIO/PWM to motor drivers, encoder feedback on interrupt pins</div>
+          </div>
+          <div class="gallery-item">
+            <img src="3-DOF/project_report_images/Project_Final_Report_page_007_image_01_xref_47.png" alt="DH parameter reference frame diagram" />
+            <div class="gallery-caption"><b>Kinematics:</b> DH-parameterized reference frames for forward kinematics and end-effector positioning</div>
+          </div>
         </div>
       </div>
 
       <div class="panel">
-        <h3>Performance & results</h3>
-        <p class="muted small">Closed-loop tracking fidelity and system response characteristics.</p>
-        <div class="gallery">
-          <figure>
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_018_image_01_xref_109.png" alt="Control system performance analysis" />
-            <figcaption>Motor control stability: response to spline command with encoder feedback correction</figcaption>
-          </figure>
-          <figure>
+        <h3>Motor control & closed-loop feedback</h3>
+        <p class="muted small">How individual PI/PID loops track spline commands with real-time encoder correction.</p>
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <img src="3-DOF/project_report_images/Project_Final_Report_page_007_image_02_xref_48.png" alt="Trajectory control algorithm block diagram" />
+            <div class="gallery-caption"><b>Control loop:</b> Spline trajectory → error computation → PI/PID → PWM command</div>
+          </div>
+          <div class="gallery-item">
             <img src="3-DOF/project_report_images/Project_Final_Report_page_015_image_02_xref_99.png" alt="Motor control duty cycle mapping" />
-            <figcaption>PWM duty cycle vs. desired speed: control mapping used in real-time loop</figcaption>
-          </figure>
+            <div class="gallery-caption"><b>PWM mapping:</b> Controller output (control signal) → duty cycle modulation for motor speed</div>
+          </div>
+          <div class="gallery-item">
+            <img src="3-DOF/project_report_images/Project_Final_Report_page_018_image_01_xref_109.png" alt="Control system performance analysis" />
+            <div class="gallery-caption"><b>Performance:</b> Tracking fidelity showing stable response to spline command input</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Real-time performance</h3>
+        <p class="muted small">Trajectory tracking accuracy and motor response characteristics.</p>
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <img src="3-DOF/project_report_images/Project_Final_Report_page_013_image_01_xref_92.png" alt="Trajectory tracking performance graph" />
+            <div class="gallery-caption"><b>Trajectory match:</b> Actual motor positions vs. desired spline—showing tracking fidelity across all 5 joints</div>
+          </div>
+          <div class="gallery-item">
+            <img src="3-DOF/project_report_images/Project_Final_Report_page_009_image_01_xref_55.jpeg" alt="Hardware test setup with oscilloscope" />
+            <div class="gallery-caption"><b>Test setup:</b> Real-time measurement and validation of motor control loop performance</div>
+          </div>
         </div>
       </div>
 
