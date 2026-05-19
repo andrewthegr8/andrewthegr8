@@ -3,292 +3,251 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>3-DOF Robotic Harvester — Control System</title>
-  <meta name="description" content="Embedded control system design for multi-motor manipulator: trajectory planning, cascaded PI/PID control, encoder feedback, PWM optimization." />
+  <title>3-DOF Robotic Harvester — Embedded Control Case Study</title>
+  <meta name="description" content="Robotics portfolio case study covering a 5-motor 3-DOF robotic 3D print harvester: Python control software, cubic spline trajectory generation, encoder feedback, PI/PID motor control, telemetry, and hardware-timed PWM." />
   <link rel="stylesheet" href="styles.css" />
   <script defer src="site.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script defer src="harvester-media.js"></script>
 </head>
 <body>
   <header class="nav">
-    <a class="brand" href="./">← Portfolio</a>
-    <nav class="navlinks">
-      <a href="#overview">Overview</a>
-      <a href="#approach">Technical Approach</a>
-      <a href="#results">Results & Lessons</a>
+    <a class="brand" href="./">← Andrew Jones</a>
+    <nav class="navlinks" aria-label="Harvester case study sections">
+      <a href="#impact">Impact</a>
+      <a href="#system">System</a>
+      <a href="#controls">Controls</a>
+      <a href="#results">Results</a>
     </nav>
   </header>
 
   <main>
     <section class="hero hero-tight">
       <div class="hero-text">
-        <div class="pill">Embedded Control • Real-Time Systems • 5-Motor Manipulation</div>
-        <h1>3-DOF Robotic Harvester — Control System Design</h1>
+        <div class="case-kicker">Robotics case study · embedded control · hardware debugging</div>
+        <h1>3-DOF Robotic Harvester for Automated 3D Print Removal</h1>
         <p class="lede">
-          Implemented end-to-end embedded control software for a 5-motor manipulator arm performing a 24-waypoint harvesting sequence. Designed trajectory planning with cubic splines, cascaded PI/PID control loops with empirically tuned gains, and debugged hardware PWM stability issues through root-cause analysis and DMA-based optimization.
+          I built the embedded control software for a 5-motor robotic harvester that removes, flips, flexes, and replaces a 3D printer build plate. The system combines cubic spline trajectory generation, encoder feedback, per-motor PI/PID control, telemetry logging, and hardware-timed PWM to turn a low-cost prototype into a repeatable manipulation system.
         </p>
         <div class="cta-row">
-          <a class="btn primary" href="#approach">See the design</a>
-          <a class="btn" href="Project%20Final%20Report.pdf" target="_blank" rel="noreferrer">Full report (PDF)</a>
-          <a class="btn" href="FinalPresentation.pptx" target="_blank" rel="noreferrer">Slides (PPTX)</a>
+          <a class="btn primary" href="#controls">See the control system</a>
+          <a class="btn" href="3-DOF/FinalVideo.mp4" target="_blank" rel="noreferrer">Watch demo video</a>
+          <a class="btn" href="3-DOF/Project%20Final%20Report.pdf" target="_blank" rel="noreferrer">Read full report</a>
         </div>
         <div class="tags" style="margin-top: 14px">
-          <span>Python</span><span>Raspberry Pi</span><span>Embedded Control</span><span>Trajectory Planning</span><span>Hardware Integration</span><span>Real-Time Systems</span>
+          <span>Python</span><span>Raspberry Pi</span><span>pigpio</span><span>Encoder feedback</span><span>PI/PID</span><span>Cubic splines</span><span>Hardware-timed PWM</span>
+        </div>
+        <div class="hero-proof" aria-label="Project metrics">
+          <div class="proof-card"><span class="proof-num">5</span><span class="proof-label">encoded DC gearmotors controlled independently</span></div>
+          <div class="proof-card"><span class="proof-num">200 Hz</span><span class="proof-label">target motor-control loop frequency</span></div>
+          <div class="proof-card"><span class="proof-num">21</span><span class="proof-label">programmed joint-space waypoints</span></div>
+          <div class="proof-card"><span class="proof-num">$168</span><span class="proof-label">estimated prototype component cost</span></div>
         </div>
       </div>
       <div class="hero-card">
-        <h2 class="card-title">System Overview</h2>
+        <h2 class="card-title">Engineering highlights</h2>
         <ul class="bullets">
-          <li><b>5 independent motors:</b> 3 linear axes (X-Y-Z positioning), 2 rotational (orientation + gripper).</li>
-          <li><b>24-waypoint sequence:</b> Smooth 3-6 second transitions between manufacturing targets.</li>
-          <li><b>Closed-loop control:</b> Real-time encoder feedback with PI/PID error correction at 5ms cycle time.</li>
-          <li><b>Hardware reliability:</b> Replaced software-timed PWM with DMA-based timing to eliminate jitter.</li>
+          <li><b>Controls:</b> cubic spline trajectory generation, encoder-based position feedback, PI/PID correction, and duty-cycle saturation.</li>
+          <li><b>Embedded systems:</b> Raspberry Pi GPIO, pigpio PWM, motor direction pins, quadrature encoders, and MD10C motor drivers.</li>
+          <li><b>Hardware debugging:</b> traced unstable motor behavior to software-timed PWM and moved actuation timing to pigpio hardware-timed PWM.</li>
+          <li><b>Systems integration:</b> connected kinematics, mechanical constraints, electronics, software, telemetry, and physical validation into one working prototype.</li>
         </ul>
       </div>
     </section>
 
-    <section id="overview" class="section">
+    <section id="impact" class="section">
       <div class="section-head">
-        <h2>Project Scope & Ownership</h2>
-        <p class="muted">Built the complete control software stack from trajectory generation through motor actuation.</p>
+        <h2>Project impact</h2>
+        <p class="muted">A low-cost prototype for automating one of the most manual steps in 3D printing: unloading the finished build plate.</p>
+      </div>
+      <div class="impact-grid">
+        <article class="impact-card">
+          <h3>Problem</h3>
+          <p>Finished prints often sit on printers until a person removes them, creating downtime and limiting continuous printer operation.</p>
+        </article>
+        <article class="impact-card">
+          <h3>Solution</h3>
+          <p>A fixed 3-DOF mechanism that grips the build plate, lifts it from the printer, rotates it, flexes it in a fixture, and returns it for the next print cycle.</p>
+        </article>
+        <article class="impact-card">
+          <h3>Result</h3>
+          <p>The prototype executed a repeatable multi-step harvesting sequence using closed-loop motor control and logged telemetry for post-run analysis.</p>
+        </article>
       </div>
 
-      <div class="two-col">
-        <div class="panel">
-          <h3>Responsibilities</h3>
-          <ul class="bullets">
-            <li><b>Control architecture:</b> Designed cascaded PI/PID loop structure for multi-motor coordination.</li>
-            <li><b>Trajectory planning:</b> Implemented cubic spline interpolation ensuring smooth, continuous-acceleration paths.</li>
-            <li><b>Real-time software:</b> Wrote GoatedScript.py (Raspberry Pi) with 5ms deterministic control loop.</li>
-            <li><b>Hardware integration:</b> Encoder ISR setup, PWM output, GPIO direction control, motor driver interfacing.</li>
-            <li><b>Control tuning:</b> Empirically tuned Kp/Ki/Kd for 5 heterogeneous motors via step response testing.</li>
-            <li><b>Debugging:</b> Identified and resolved PWM stability issues using oscilloscope analysis and DMA implementation.</li>
-          </ul>
+      <div class="case-banner">
+        <div class="panel case-media">
+          <h3>Physical robot</h3>
+          <img loading="lazy" src="3-DOF/project_report_images/Project_Final_Report_page_009_image_01_xref_55.jpeg" alt="3-DOF robotic harvester prototype beside a 3D printer and build plate fixture" />
+          <p class="muted small">Prototype layout with the 3D printer on the left, the harvester in the center, and the print-removal fixture on the right.</p>
         </div>
         <div class="panel">
-          <h3>Constraints & Context</h3>
-          <ul class="bullets">
-            <li><b>Hardware platform:</b> Raspberry Pi 4 running Linux with pigpio library for GPIO/PWM control.</li>
-            <li><b>Real-time requirement:</b> 5ms control cycle to maintain trajectory tracking fidelity.</li>
-            <li><b>Motor heterogeneity:</b> 3 linear motors (identical dynamics) + 2 rotational motors (different load profiles).</li>
-            <li><b>Waypoint density:</b> 24 target positions requiring smooth motion between each transition.</li>
-            <li><b>Production stability:</b> System must execute repeatable sequences with consistent performance.</li>
-          </ul>
+          <h3>My ownership</h3>
+          <div class="role-list">
+            <div class="role-item"><b>Trajectory planning</b><span>Generated per-joint cubic splines between waypoints so each motion segment started and stopped smoothly.</span></div>
+            <div class="role-item"><b>Control software</b><span>Implemented encoder reads, elapsed-time tracking, position-error calculation, PI/PID terms, output saturation, direction control, and PWM commands.</span></div>
+            <div class="role-item"><b>Reliability tools</b><span>Added CSV telemetry, terminal status output, CTRL_OVERRIDE debugging mode, and signal-handled motor shutdown for safer testing.</span></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="approach" class="section">
+    <section id="system" class="section">
       <div class="section-head">
-        <h2>Technical Approach</h2>
-        <p class="muted">How the control system orchestrates five motors across a complex manufacturing sequence.</p>
+        <h2>System design</h2>
+        <p class="muted">The harvester combines a simple mechanical architecture with a complete software-to-actuator control stack.</p>
+      </div>
+      <div class="two-col">
+        <div class="panel diagram-panel">
+          <h3>Software + hardware stack</h3>
+          <img class="diagram-img" loading="lazy" src="3-DOF/diagrams/software_stack.svg" alt="Layered software and hardware stack for the robotic harvester" />
+        </div>
+        <div class="panel">
+          <h3>Architecture summary</h3>
+          <ul class="bullets">
+            <li><b>Planner:</b> computes a fresh cubic spline for each waypoint transition.</li>
+            <li><b>Feedback:</b> reads quadrature encoders and converts counts to inches or degrees.</li>
+            <li><b>Controller:</b> computes PI/PID corrections and saturates outputs to safe duty-cycle limits.</li>
+            <li><b>Actuator layer:</b> sends direction and PWM commands to MD10C drivers for five 12 V gearmotors.</li>
+            <li><b>Validation:</b> logs desired and actual joint positions to CSV for post-run analysis.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel diagram-panel" style="margin-top: 1rem;">
+        <h3>Waypoint sequence</h3>
+        <p class="muted small">The robot performed a staged manipulation task rather than isolated motor tests: grip, lift, rotate, flex, release, and return.</p>
+        <img class="diagram-img" loading="lazy" src="3-DOF/diagrams/waypoint_sequence.svg" alt="Waypoint path for the 3-DOF harvester sequence" />
+      </div>
+    </section>
+
+    <section id="controls" class="section">
+      <div class="section-head">
+        <h2>Controls and embedded implementation</h2>
+        <p class="muted">The core engineering loop maps a desired waypoint into real motor commands and verifies the result with encoder feedback.</p>
       </div>
 
-      <!-- Control Flow Diagram -->
-      <div class="panel">
-        <h3>Real-Time Control Architecture</h3>
-        <p class="muted small">The 5ms feedback loop that synchronizes all motor motion with encoder feedback and spline-generated commands.</p>
-        <svg width="100%" viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg" style="margin-top: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,.02); padding: 10px;">
-          <defs>
-            <style>
-              .flow-node { fill: #e8f4f8; stroke: #2c3e50; stroke-width: 2; }
-              .flow-start { fill: #90EE90; stroke: #2c3e50; stroke-width: 2; }
-              .flow-decision { fill: #ffcccc; stroke: #2c3e50; stroke-width: 2; }
-              .flow-text { font-family: Helvetica, Arial, sans-serif; font-size: 12px; text-anchor: middle; fill: #1a1a1a; font-weight: 500; }
-              .flow-small { font-size: 10px; }
-              .flow-arrow { stroke: #2c3e50; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
-              .flow-label { font-family: Helvetica, Arial, sans-serif; font-size: 9px; fill: #2c3e50; }
-            </style>
-            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-              <polygon points="0 0, 10 3, 0 6" fill="#2c3e50" />
-            </marker>
-          </defs>
-          
-          <!-- Title -->
-          <text x="400" y="30" text-anchor="middle" style="font-size: 16px; font-weight: bold; fill: #1a1a1a;">5ms Real-Time Control Loop</text>
-          
-          <!-- Row 1: Start -->
-          <ellipse cx="400" cy="80" rx="60" ry="30" class="flow-start"/>
-          <text x="400" y="85" class="flow-text">Start:<tspan x="400" dy="16">24 Waypoints</tspan></text>
-          
-          <!-- Arrow -->
-          <path d="M 400 110 L 400 150" class="flow-arrow"/>
-          
-          <!-- Row 2: Spline Generation -->
-          <rect x="300" y="150" width="200" height="60" rx="5" class="flow-node"/>
-          <text x="400" y="180" class="flow-text">Generate Cubic<tspan x="400" dy="16">Spline Coefficients</tspan></text>
-          
-          <!-- Arrow -->
-          <path d="M 400 210 L 400 250" class="flow-arrow"/>
-          
-          <!-- Row 3: Main Loop -->
-          <rect x="300" y="250" width="200" height="60" rx="8" class="flow-node" stroke-width="3"/>
-          <text x="400" y="280" class="flow-text" style="font-weight: bold;">Real-Time Loop<tspan x="400" dy="16">(5ms cycle)</tspan></text>
-          
-          <!-- Arrow -->
-          <path d="M 400 310 L 400 350" class="flow-arrow"/>
-          
-          <!-- Row 4: Read Encoders -->
-          <rect x="300" y="350" width="200" height="60" rx="5" class="flow-node" style="fill: #fffacd"/>
-          <text x="400" y="380" class="flow-text">Read Encoders<tspan x="400" dy="16">(5 motors)</tspan></text>
-          
-          <!-- Arrow -->
-          <path d="M 400 410 L 400 450" class="flow-arrow"/>
-          
-          <!-- Row 5: Calculate Error -->
-          <rect x="300" y="450" width="200" height="60" rx="5" class="flow-node"/>
-          <text x="400" y="480" class="flow-text">Calculate Error:<tspan x="400" dy="16">e = desired - actual</tspan></text>
-          
-          <!-- Arrows to PI and PID -->
-          <path d="M 350 510 L 200 550" class="flow-arrow"/>
-          <path d="M 450 510 L 600 550" class="flow-arrow"/>
-          
-          <!-- Row 6: PI Control (Left) -->
-          <rect x="80" y="550" width="240" height="60" rx="5" class="flow-node"/>
-          <text x="200" y="575" class="flow-text">Motor 1-3:<tspan x="200" dy="14">PI Control</tspan><tspan x="200" dy="14">(linear axes)</tspan></text>
-          
-          <!-- Row 6: PID Control (Right) -->
-          <rect x="480" y="550" width="240" height="60" rx="5" class="flow-node"/>
-          <text x="600" y="575" class="flow-text">Motor 4-5:<tspan x="600" dy="14">PID Control</tspan><tspan x="600" dy="14">(rotation/gripper)</tspan></text>
-          
-          <!-- Arrows converge to PWM -->
-          <path d="M 200 610 L 200 640 L 400 640 L 400 670" class="flow-arrow"/>
-          <path d="M 600 610 L 600 640 L 400 640" class="flow-arrow"/>
-          
-          <!-- Row 7: PWM Output -->
-          <rect x="300" y="670" width="200" height="60" rx="5" class="flow-node"/>
-          <text x="400" y="700" class="flow-text">Output PWM<tspan x="400" dy="16">Commands</tspan></text>
-        </svg>
-        <p style="margin-top: 12px; font-size: 13px; color: var(--muted);"><b>Control sequence:</b> Each 5ms cycle reads encoder positions, computes tracking error, applies PI/PID corrections per motor, and outputs PWM signals. Motors 1-3 (linear X-Y-Z) use identical PI gains; Motors 4-5 (rotation and gripper) use PID with different tuning.</p>
+      <div class="panel diagram-panel">
+        <h3>Real-time control loop</h3>
+        <img class="diagram-img" loading="lazy" src="3-DOF/diagrams/control_flow.svg" alt="Real-time control architecture diagram showing waypoint, spline, encoder, error, PI/PID, PWM, and telemetry loop" />
       </div>
 
-      <!-- Trajectory Planning -->
-      <div class="panel">
-        <h3>Trajectory Planning: Cubic Spline Interpolation</h3>
-        <p class="muted small">Smooth acceleration profiles between waypoints with zero velocity at endpoints ensure stable motor behavior and accurate trajectory tracking.</p>
-        <img src="3-DOF/spline_math_diagram.svg" alt="Cubic spline mathematics and boundary conditions" style="width: 100%; height: auto; margin-top: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,.02); padding: 10px;">
+      <div class="two-col" style="margin-top: 1rem;">
+        <div class="panel diagram-panel">
+          <h3>Cubic spline trajectory generation</h3>
+          <img class="diagram-img" loading="lazy" src="3-DOF/diagrams/spline_math_diagram.svg" alt="Cubic spline trajectory mathematics and boundary conditions" />
+        </div>
+        <div class="panel diagram-panel">
+          <h3>Motor gains and actuator roles</h3>
+          <img class="diagram-img" loading="lazy" src="3-DOF/diagrams/motor_gains.svg" alt="Motor control gains table showing Kp, Ki, Kd, loop type, and actuator role" />
+        </div>
       </div>
 
-      <!-- Control Gains -->
-      <div class="panel">
-        <h3>Motor Control Gains</h3>
-        <p class="muted small">Five independent PI/PID controllers with gains tuned to each motor's dynamics through empirical step response testing.</p>
-        <img src="3-DOF/diagrams/motor_gains.svg" alt="Motor control gains table with Kp Ki Kd values" style="width: 100%; height: auto; margin-top: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,.02); padding: 10px;">
-      </div>
+      <div class="panel" style="margin-top: 1rem;">
+        <h3>Code excerpt: spline coefficients to motor command</h3>
+        <div class="code-callout">
+          <pre class="code-snippet"><code>def GimmeCoeff(start, end, tf):
+    IC = np.array([start, 0, end, 0])
+    A = np.array([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [1, tf, tf**2, tf**3],
+        [0, 1, 2*tf, 3*tf**2]
+    ])
+    return np.linalg.solve(A, IC)
 
-      <!-- Demo Video -->
-      <div class="panel">
-        <h3>System in Operation</h3>
-        <video class="video" controls preload="metadata">
-          <source src="3-DOF/FinalVideo.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <p class="muted small">Complete 24-waypoint manufacturing sequence showing coordinated multi-motor motion with smooth trajectories and stable end-effector control.</p>
+def TargetDist(t, coeff):
+    return coeff[0] + coeff[1]*t + coeff[2]*t**2 + coeff[3]*t**3</code></pre>
+          <div>
+            <p><b>Implementation detail:</b> each waypoint transition gets new spline coefficients. During the motor loop, the controller evaluates the desired position, compares it to encoder-derived position, and converts the tracking error into a PWM duty cycle.</p>
+            <p class="muted">This kept the robot motion smoother than step commands or linear interpolation while preserving a simple implementation that ran on the Raspberry Pi.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <section id="results" class="section">
       <div class="section-head">
-        <h2>Key Engineering Challenges & Solutions</h2>
-        <p class="muted">Technical decisions that enabled reliable operation.</p>
+        <h2>Debugging and results</h2>
+        <p class="muted">The strongest lesson from the project was recognizing when instability came from timing, not just control gains.</p>
       </div>
 
-      <div class="grid">
-        <article class="project">
-          <h3>Trajectory Planning: Cubic Splines</h3>
-          <p><b>Challenge:</b> Linear interpolation between waypoints produces discontinuous accelerations, causing motor overshoot and erratic behavior.</p>
-          <p><b>Solution:</b> Cubic polynomial interpolation with zero-velocity boundary conditions. Solves a 4×4 linear system for each waypoint transition to guarantee continuous acceleration profiles.</p>
-          <p><b>Implementation:</b> <code>GimmeCoeff()</code> computes spline coefficients; <code>TargetDist()</code> evaluates the cubic in real-time for each motor every 5ms. All 24 waypoint transitions use this approach.</p>
-          <p><b>Result:</b> Smooth, predictable motion with minimal overshoot. Trajectory tracking error reduced to 5-8% across all axes.</p>
-        </article>
+      <div class="panel diagram-panel">
+        <h3>Key debugging story: PWM timing</h3>
+        <p class="muted small">Initial software-timed PWM produced inconsistent timing on a general-purpose operating system. Moving PWM generation to pigpio hardware-timed output made actuation timing more deterministic.</p>
+        <img class="diagram-img" loading="lazy" src="3-DOF/diagrams/pwm_dma_comparison.svg" alt="Before and after diagram comparing software-timed PWM with hardware-timed PWM" />
+      </div>
 
+      <div class="grid" style="margin-top: 1rem;">
         <article class="project">
-          <h3>Multi-Motor Cascade Control</h3>
-          <p><b>Challenge:</b> Five motors with disparate dynamics (3 linear, 2 rotational). A single PI/PID gain set cannot handle the variation.</p>
-          <p><b>Solution:</b> Independent PI/PID loops for each motor with empirically tuned gains. Joints 1-3 use PI control; Joints 4-5 use PID for improved stability on the rotational axes.</p>
-          <p><b>Implementation:</b> Each motor's error accumulates in <code>esum</code>, driving the integral term. Proportional term uses encoder-measured position. PWM output saturates at 0-100% duty cycle.</p>
-          <p><b>Result:</b> All motors track their spline-generated setpoints with stable, bounded responses. System handles load transients without oscillation.</p>
+          <h3>Trajectory tracking</h3>
+          <p>The desired and actual joint trajectories closely follow one another across the task sequence, demonstrating that the feedback loops tracked the generated splines on physical hardware.</p>
         </article>
-
         <article class="project">
-          <h3>PWM Stability: Eliminating Jitter via DMA</h3>
-          <p><b>Challenge:</b> Initial implementation used software-timed PWM via Raspberry Pi GPIO. OS context switching introduced timing jitter, causing controller instability and poor encoder synchronization.</p>
-          <p><b>Root Cause Analysis:</b> Oscilloscope measurements revealed PWM edges drifting ±2-5ms. This jitter propagated through encoder ISR contention, creating cascading control errors.</p>
-          <p><b>Solution:</b> Switched to hardware-based DMA-timed PWM using the Raspberry Pi's PWM peripheral. Timer clock generates pulses independent of CPU load, ensuring deterministic timing.</p>
-          <p><b>Result:</b> Zero timing jitter. Controller stability improved dramatically. System can now sustain 24-waypoint sequences with predictable, repeatable performance.</p>
+          <h3>Timing compensation</h3>
+          <p>Because the Raspberry Pi is not a real-time controller, the script measured elapsed time at each encoder read instead of assuming a perfect fixed sample period.</p>
+        </article>
+        <article class="project">
+          <h3>Next iteration</h3>
+          <p>I would move hard real-time motor control to an STM32 or RTOS-based controller, keep the Pi for planning and UI, add homing switches, and implement a more explicit safety state machine.</p>
         </article>
       </div>
 
-      <!-- PWM DMA Comparison -->
-      <div class="panel" style="margin-top: 20px;">
-        <h3>PWM Timing Improvement: Before and After</h3>
-        <p class="muted small">The critical hardware fix that enabled reliable closed-loop control.</p>
-        <img src="3-DOF/diagrams/pwm_dma_comparison.svg" alt="PWM signal comparison: software vs DMA timing" style="width: 100%; height: auto; margin-top: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,.02); padding: 10px;">
+      <div class="panel" style="margin-top: 1rem;">
+        <h3>Demo video</h3>
+        <video class="video" controls preload="metadata" poster="3-DOF/project_report_images/Project_Final_Report_page_009_image_01_xref_55.jpeg">
+          <source src="3-DOF/FinalVideo.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <p class="muted small">Full robot demonstration showing the coordinated multi-step harvesting sequence.</p>
       </div>
 
-      <!-- System Performance -->
-      <div class="panel" style="margin-top: 20px;">
-        <h3>Mechanical Design & Kinematics</h3>
-        <p class="muted small">The hardware platform on which the control software executes.</p>
+      <div class="panel" style="margin-top: 1rem;">
+        <h3>Project visuals</h3>
+        <p class="muted small">Selected images from the report show the mechanical layout, electronics integration, and validation work behind the control system.</p>
         <div class="gallery-grid">
           <div class="gallery-item">
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_008_image_01_xref_51.png" alt="Full 3-DOF harvester assembly" />
-            <div class="gallery-caption"><b>Mechanical assembly:</b> 3-DOF arm (X-Y-Z positioning) with 2-axis end-effector (rotation + gripper)</div>
+            <img loading="lazy" src="3-DOF/project_report_images/Project_Final_Report_page_008_image_01_xref_51.png" alt="Final design workspace image from the project report" />
+            <div class="gallery-caption"><b>Workspace:</b> final CAD layout and reachable print-handling region.</div>
           </div>
           <div class="gallery-item">
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_010_image_01_xref_64.jpeg" alt="System electrical schematic" />
-            <div class="gallery-caption"><b>Electronics:</b> Raspberry Pi GPIO/PWM to motor drivers, encoder feedback on interrupt pins</div>
+            <img loading="lazy" src="3-DOF/project_report_images/Project_Final_Report_page_010_image_01_xref_64.jpeg" alt="Robot top view and electronics setup" />
+            <div class="gallery-caption"><b>Electronics:</b> Pi, drivers, power, and encoder wiring integrated on the prototype.</div>
           </div>
           <div class="gallery-item">
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_007_image_01_xref_47.png" alt="DH parameter reference frame diagram" />
-            <div class="gallery-caption"><b>Kinematics:</b> DH-parameterized forward kinematics for end-effector positioning</div>
+            <img loading="lazy" src="3-DOF/project_report_images/Project_Final_Report_page_013_image_01_xref_92.png" alt="Trajectory planning plot from project report" />
+            <div class="gallery-caption"><b>Kinematics:</b> DH and path planning work behind the robot motions.</div>
+          </div>
+          <div class="gallery-item">
+            <img loading="lazy" src="3-DOF/project_report_images/Project_Final_Report_page_018_image_01_xref_109.png" alt="Desired versus actual trajectory tracking plot" />
+            <div class="gallery-caption"><b>Software:</b> cubic trajectory functions used by the live Python controller.</div>
           </div>
         </div>
       </div>
 
-      <!-- Performance Results -->
-      <div class="panel" style="margin-top: 20px;">
-        <h3>Trajectory Tracking Performance</h3>
-        <p class="muted small">Closed-loop control fidelity across the 24-waypoint sequence.</p>
-        <div class="gallery-grid">
-          <div class="gallery-item">
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_013_image_01_xref_92.png" alt="Trajectory tracking performance graph" />
-            <div class="gallery-caption"><b>Tracking accuracy:</b> Desired (spline) vs actual (encoder) positions showing 5-8% steady-state error</div>
-          </div>
-          <div class="gallery-item">
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_018_image_01_xref_109.png" alt="Control system performance analysis" />
-            <div class="gallery-caption"><b>Control stability:</b> Motor response showing no overshoot or oscillation after DMA fix</div>
-          </div>
-          <div class="gallery-item">
-            <img src="3-DOF/project_report_images/Project_Final_Report_page_009_image_01_xref_55.jpeg" alt="Hardware test setup with oscilloscope" />
-            <div class="gallery-caption"><b>Validation:</b> Real-time measurement and logging of control performance on operating hardware</div>
-          </div>
+      <div class="panel" style="margin-top: 1rem;">
+        <h3>Load report and slide media</h3>
+        <p class="muted small">Open selected report pages or extracted slide images directly in the browser without leaving the case study.</p>
+        <div class="media-actions">
+          <button id="pdf-load" class="btn" type="button">Load report pages</button>
+          <button id="pptx-load" class="btn" type="button">Load slide images</button>
         </div>
+        <div id="pdf-gallery" class="media-gallery" aria-live="polite"></div>
+        <div id="pptx-gallery" class="media-gallery" aria-live="polite" style="margin-top: 1rem;"></div>
       </div>
     </section>
 
-    <section style="margin-top: 50px;">
+    <section class="section">
       <div class="section-head">
-        <h2>Takeaways</h2>
+        <h2>What I would build next</h2>
+        <p class="muted">The prototype proved the core motion sequence. The next version would focus on robustness, safety, and deployability.</p>
       </div>
-      <div class="two-col">
-        <div class="panel">
-          <h3>What Worked</h3>
-          <ul class="bullets">
-            <li>Cubic spline trajectories provided smooth, predictable motion without overshoot.</li>
-            <li>Empirical gain tuning via step response enabled stable multi-motor coordination.</li>
-            <li>Closed-loop encoder feedback gave real-time control authority and trajectory fidelity.</li>
-            <li>Systematic debugging with test equipment (oscilloscope) identified root causes quickly.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3>Key Lesson: Hardware Matters</h3>
-          <ul class="bullets">
-            <li>Software-only timing is unreliable on general-purpose OS. Use hardware peripherals (DMA, dedicated timers) for real-time constraints.</li>
-            <li>Jitter in one signal (PWM) propagates through the entire system (encoder ISR, controller stability).</li>
-            <li>Instrumenting the system (oscilloscope, CSV logging) is essential for debugging embedded control loops.</li>
-            <li>Small design choices early (hardware timer vs software loop) have massive impact on system reliability.</li>
-          </ul>
-        </div>
+      <div class="timeline">
+        <div class="timeline-step"><span>1</span><p>Add homing switches and hard travel limits for repeatable startup.</p></div>
+        <div class="timeline-step"><span>2</span><p>Move motor timing to a microcontroller with deterministic control loops.</p></div>
+        <div class="timeline-step"><span>3</span><p>Separate high-level sequencing from low-level motor control.</p></div>
+        <div class="timeline-step"><span>4</span><p>Add fault detection for stalled motors, missed encoder counts, and unsafe positions.</p></div>
+        <div class="timeline-step"><span>5</span><p>Package the system as a safer printer-farm automation cell.</p></div>
       </div>
     </section>
 
@@ -303,7 +262,7 @@
   </main>
 
   <footer class="footer">
-    <span class="muted">© <span id="year"></span> Andrew Jones</span>
+    <span class="muted">© <span id="year"></span> Andrew Jones · Robotics portfolio</span>
   </footer>
 </body>
 </html>

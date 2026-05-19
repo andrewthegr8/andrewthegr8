@@ -269,3 +269,171 @@ h1{ margin: 10px 0 10px; font-size: 44px; line-height: 1.06; }
 .gallery-caption b{
   color: var(--text);
 }
+
+/* Harvester case study additions */
+.case-kicker {
+  color: #5eead4;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  font-size: .78rem;
+  margin-bottom: .85rem;
+}
+
+.hero-proof {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .75rem;
+  margin-top: 1.25rem;
+}
+
+.proof-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  background: rgba(255,255,255,.035);
+}
+
+.proof-num {
+  display: block;
+  color: #5eead4;
+  font-size: 1.55rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.proof-label {
+  display: block;
+  margin-top: .35rem;
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+.case-banner {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 1rem;
+  align-items: stretch;
+  margin-top: 1.25rem;
+}
+
+.case-banner img,
+.case-media img,
+.diagram-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+}
+
+.case-banner .panel { margin: 0; }
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 16px;
+}
+
+.impact-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+  padding: 1.15rem;
+}
+
+.impact-card h3 { margin-top: 0; }
+
+.role-list { display: grid; gap: .7rem; }
+
+.role-item {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 1rem;
+  padding: .9rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,.025);
+}
+
+.role-item b { color: #5eead4; }
+
+.diagram-panel { overflow: hidden; }
+.diagram-panel .diagram-img { padding: 0; }
+
+.code-callout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+pre.code-snippet {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(0,0,0,.33);
+  color: #e7f5ff;
+  font-size: .88rem;
+  line-height: 1.45;
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: .75rem;
+  margin-top: .75rem;
+}
+
+.timeline-step {
+  padding: .9rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(94,234,212,.08), rgba(255,255,255,.02));
+}
+
+.timeline-step span {
+  color: #5eead4;
+  font-weight: 800;
+}
+
+.media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  margin: .85rem 0 1rem;
+}
+
+.media-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .85rem;
+}
+
+.thumbcap {
+  padding: .7rem;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.btn.disabled,
+.btn[disabled] {
+  opacity: .65;
+  cursor: wait;
+}
+
+@media (max-width: 900px) {
+  .hero-proof,
+  .impact-grid,
+  .timeline,
+  .case-banner,
+  .code-callout {
+    grid-template-columns: 1fr;
+  }
+
+  .role-item { grid-template-columns: 1fr; }
+}

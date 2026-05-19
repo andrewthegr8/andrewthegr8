@@ -1,8 +1,8 @@
 /*
-  Client-side media extraction:
-  - PDF pages rendered via pdf.js
-  - PPTX images extracted by unzipping the .pptx (a zip) via JSZip and reading ppt/media/*
-  Test
+  Optional media loader for harvester.html.
+  - Renders selected report pages in-browser with pdf.js.
+  - Extracts raster images from the PPTX with JSZip.
+  The case study still works if these CDN libraries are blocked; users can open the PDF/PPTX directly.
 */
 
 function $(id) { return document.getElementById(id); }
@@ -12,7 +12,6 @@ function openModal(src, caption) {
   const img = $('modal-img');
   const cap = $('modal-caption');
   if (!modal || !img || !cap) return;
-
   img.src = src;
   cap.textContent = caption || '';
   modal.setAttribute('aria-hidden', 'false');
@@ -30,127 +29,100 @@ function wireModal() {
   const modal = $('modal');
   if (!modal) return;
   modal.addEventListener('click', (e) => {
-    const t = e.target;
-    if (t && t.dataset && t.dataset.close === 'true') closeModal();
+    const target = e.target;
+    if (target && target.dataset && target.dataset.close === 'true') closeModal();
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
   });
+
+  document.querySelectorAll('.gallery-item').forEach((item) => {
+    const img = item.querySelector('img');
+    const caption = item.querySelector('.gallery-caption');
+    if (!img) return;
+    item.addEventListener('click', () => openModal(img.src, caption ? caption.textContent : img.alt));
+  });
 }
 
-async function renderPdfPages({ pdfUrl, container, pageNumbers, scale = 1.35 }) {
-  if (!window.pdfjsLib) throw new Error('pdf.js not loaded');
-  // Configure worker
-  if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js';
+function setButtonBusy(button, isBusy) {
+  if (!button) return;
+  if (isBusy) {
+    button.setAttribute('disabled', 'true');
+    button.classList.add('disabled');
+  } else {
+    button.removeAttribute('disabled');
+    button.classList.remove('disabled');
   }
+}
 
-  container.innerHTML = '';
+async function renderPdfPages({ pdfUrl, container, pageNumbers, scale = 1.25 }) {
+  if (!window.pdfjsLib) throw new Error('pdf.js is not loaded');
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-  const loading = document.createElement('div');
-  loading.className = 'muted small';
-  loading.textContent = 'Loading PDF pages…';
-  container.appendChild(loading);
-
+  container.innerHTML = '<div class="muted small">Loading report pages...</div>';
   const pdf = await window.pdfjsLib.getDocument(pdfUrl).promise;
   container.innerHTML = '';
 
-  for (const n of pageNumbers) {
-    const page = await pdf.getPage(n);
+  for (const pageNumber of pageNumbers) {
+    const page = await pdf.getPage(pageNumber);
     const viewport = page.getViewport({ scale });
-
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', { alpha: false });
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
-
     await page.render({ canvasContext: ctx, viewport }).promise;
 
-    // Wrap in a clickable thumb
     const wrap = document.createElement('div');
     wrap.className = 'thumb';
-
     const cap = document.createElement('div');
     cap.className = 'thumbcap';
-    cap.textContent = `Report page ${n}`;
-
+    cap.textContent = `Report page ${pageNumber}`;
     wrap.appendChild(canvas);
     wrap.appendChild(cap);
-
-    wrap.addEventListener('click', () => {
-      const dataUrl = canvas.toDataURL('image/png');
-      openModal(dataUrl, `Report page ${n}`);
-    });
-
+    wrap.addEventListener('click', () => openModal(canvas.toDataURL('image/png'), `Report page ${pageNumber}`));
     container.appendChild(wrap);
   }
 }
 
-async function extractPptxImages({ pptxUrl, container, limit = 30 }) {
-  if (!window.JSZip) throw new Error('JSZip not loaded');
+async function extractPptxImages({ pptxUrl, container, limit = 18 }) {
+  if (!window.JSZip) throw new Error('JSZip is not loaded');
 
-  container.innerHTML = '';
-  const loading = document.createElement('div');
-  loading.className = 'muted small';
-  loading.textContent = 'Extracting images from PPTX…';
-  container.appendChild(loading);
-
+  container.innerHTML = '<div class="muted small">Extracting slide media...</div>';
   const res = await fetch(pptxUrl);
   if (!res.ok) throw new Error(`Failed to fetch PPTX (${res.status})`);
-  const buf = await res.arrayBuffer();
-
-  const zip = await window.JSZip.loadAsync(buf);
-
+  const zip = await window.JSZip.loadAsync(await res.arrayBuffer());
   const mediaEntries = Object.keys(zip.files)
-    .filter((p) => p.startsWith('ppt/media/'))
-    .filter((p) => /\.(png|jpe?g|gif)$/i.test(p))
+    .filter((path) => path.startsWith('ppt/media/'))
+    .filter((path) => /\.(png|jpe?g|gif|webp)$/i.test(path))
     .sort((a, b) => a.localeCompare(b));
 
   container.innerHTML = '';
-
   if (mediaEntries.length === 0) {
-    const none = document.createElement('div');
-    none.className = 'muted small';
-    none.textContent = 'No compatible raster images found in ppt/media/. (If slides are mostly vector, we can export slide renders later.)';
-    container.appendChild(none);
+    container.innerHTML = '<div class="muted small">No compatible raster images found in the PPTX.</div>';
     return;
   }
 
-  const use = mediaEntries.slice(0, limit);
-
-  for (const path of use) {
+  for (const path of mediaEntries.slice(0, limit)) {
     const file = zip.file(path);
     if (!file) continue;
-
     const blob = await file.async('blob');
     const url = URL.createObjectURL(blob);
 
     const wrap = document.createElement('div');
     wrap.className = 'thumb';
-
     const img = document.createElement('img');
     img.loading = 'lazy';
     img.alt = path.replace('ppt/media/', '');
     img.src = url;
-
     const cap = document.createElement('div');
     cap.className = 'thumbcap';
     cap.textContent = img.alt;
-
     wrap.appendChild(img);
     wrap.appendChild(cap);
-
     wrap.addEventListener('click', () => openModal(img.src, img.alt));
-
     container.appendChild(wrap);
   }
-
-  const note = document.createElement('div');
-  note.className = 'muted small';
-  note.style.marginTop = '10px';
-  note.textContent = `Showing ${use.length} image(s) from PPTX media.`;
-  container.appendChild(note);
 }
 
 function initHarvesterPage() {
@@ -160,45 +132,32 @@ function initHarvesterPage() {
   const pptxBtn = $('pptx-load');
   const pdfGallery = $('pdf-gallery');
   const pptxGallery = $('pptx-gallery');
-
-  // Only run on the harvester page
   if (!pdfBtn || !pptxBtn || !pdfGallery || !pptxGallery) return;
 
   const pdfUrl = encodeURI('3-DOF/Project Final Report.pdf');
   const pptxUrl = encodeURI('3-DOF/FinalPresentation.pptx');
 
   pdfBtn.addEventListener('click', async () => {
-    pdfBtn.setAttribute('disabled', 'true');
-    pdfBtn.classList.add('disabled');
+    setButtonBusy(pdfBtn, true);
     try {
-      await renderPdfPages({ pdfUrl, container: pdfGallery, pageNumbers: [1, 2, 3, 4] });
-    } catch (e) {
-      pdfGallery.innerHTML = `<div class="muted small">Failed to render PDF pages. ${String(e)}</div>`;
+      await renderPdfPages({ pdfUrl, container: pdfGallery, pageNumbers: [9, 16, 19, 21, 23] });
+    } catch (err) {
+      pdfGallery.innerHTML = `<div class="muted small">Could not render PDF pages: ${String(err)}</div>`;
     } finally {
-      pdfBtn.removeAttribute('disabled');
-      pdfBtn.classList.remove('disabled');
+      setButtonBusy(pdfBtn, false);
     }
   });
 
   pptxBtn.addEventListener('click', async () => {
-    pptxBtn.setAttribute('disabled', 'true');
-    pptxBtn.classList.add('disabled');
+    setButtonBusy(pptxBtn, true);
     try {
       await extractPptxImages({ pptxUrl, container: pptxGallery });
-    } catch (e) {
-      pptxGallery.innerHTML = `<div class="muted small">Failed to extract PPTX images. ${String(e)}</div>`;
+    } catch (err) {
+      pptxGallery.innerHTML = `<div class="muted small">Could not extract slide images: ${String(err)}</div>`;
     } finally {
-      pptxBtn.removeAttribute('disabled');
-      pptxBtn.classList.remove('disabled');
+      setButtonBusy(pptxBtn, false);
     }
   });
-
-  // Auto-load media for a more “flashy” first impression.
-  // Buttons remain for quick reload/retry.
-  setTimeout(() => {
-    pdfBtn.click();
-    pptxBtn.click();
-  }, 0);
 }
 
 document.addEventListener('DOMContentLoaded', initHarvesterPage);
