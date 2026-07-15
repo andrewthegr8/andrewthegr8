@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="630" viewBox="0 0 920 630" role="img">
+  <defs>
+    <style>
+      .bg { fill: #07111f; }
+      .panel { fill: #0a1628; stroke: #223957; stroke-width: 1.4; }
+      .panel2 { fill: #0f2138; stroke: #315273; stroke-width: 1.4; }
+      .panel3 { fill: #102b35; stroke: #2c6d73; stroke-width: 1.4; }
+      .chip { fill: #0f2138; stroke: #315273; stroke-width: 1.2; }
+      .labelBg { fill: #07111f; stroke: #5eead4; stroke-width: 1.1; }
+      .title { fill: #f7fbff; font: 700 25px Arial, sans-serif; }
+      .subtitle { fill: #b8cbe0; font: 500 14px Arial, sans-serif; }
+      .label { fill: #e7f0fa; font: 700 13px Arial, sans-serif; }
+      .small { fill: #b8cbe0; font: 500 12px Arial, sans-serif; }
+      .tiny { fill: #93acc8; font: 500 10.5px Arial, sans-serif; }
+      .mono { fill: #e9f3ff; font: 700 13px Consolas, Menlo, monospace; }
+      .cyan { fill: #5eead4; }
+      .blue { fill: #60a5fa; }
+      .green { fill: #86efac; }
+      .pink { fill: #fb7185; }
+      .amber { fill: #fbbf24; }
+      .gridline { stroke: #203650; stroke-width: 1; }
+      .axis { stroke: #6f8cab; stroke-width: 1.5; }
+      .arrow { stroke: #b8cbe0; stroke-width: 2.2; fill: none; marker-end: url(#arrow); stroke-linecap: round; stroke-linejoin: round; }
+      .arrowCyan { stroke: #5eead4; stroke-width: 2.6; fill: none; marker-end: url(#arrowCyan); stroke-linecap: round; stroke-linejoin: round; }
+      .wire { stroke: #6f8cab; stroke-width: 2.0; fill: none; marker-end: url(#arrow); stroke-linecap: round; stroke-linejoin: round; }
+      .lineCyan { stroke: #5eead4; stroke-width: 3.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .lineBlue { stroke: #60a5fa; stroke-width: 3.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3.5 L0,7 Z" fill="#b8cbe0" />
+    </marker>
+    <marker id="arrowCyan" markerWidth="11" markerHeight="11" refX="9.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3.5 L0,7 Z" fill="#5eead4" />
+    </marker>
+  </defs>
+  <rect class="bg" width="100%" height="100%" rx="18"/>
+<text x="460.0" y="42.0" class="title" text-anchor="middle">Software and Hardware Stack</text>
+<text x="460.0" y="66.0" class="subtitle" text-anchor="middle">End-to-end control path from trajectory generation to physical motion</text>
+<rect x="95.0" y="110.0" width="730.0" height="70.0" rx="15.0" class="panel2"/>
+<text x="130.0" y="138.0" class="label" text-anchor="start">Trajectory planner</text>
+<text x="130.0" y="162.0" class="small" text-anchor="start">Cubic spline coefficients for each joint transition</text>
+<text x="790.0" y="152.0" class="cyan" text-anchor="end">Python + NumPy</text>
+<path class="arrow" d="M460,180 L460,203"/>
+<rect x="95.0" y="206.0" width="730.0" height="70.0" rx="15.0" class="panel3"/>
+<text x="130.0" y="234.0" class="label" text-anchor="start">Control loop</text>
+<text x="130.0" y="258.0" class="small" text-anchor="start">PI/PID error correction, saturation, direction control</text>
+<text x="790.0" y="248.0" class="cyan" text-anchor="end">200 Hz target</text>
+<path class="arrow" d="M460,276 L460,299"/>
+<rect x="95.0" y="302.0" width="730.0" height="70.0" rx="15.0" class="panel3"/>
+<text x="130.0" y="330.0" class="label" text-anchor="start">I/O timing</text>
+<text x="130.0" y="354.0" class="small" text-anchor="start">Encoder reads, measured delta-time, hardware-timed PWM</text>
+<text x="790.0" y="344.0" class="cyan" text-anchor="end">pigpio</text>
+<path class="arrow" d="M460,372 L460,395"/>
+<rect x="95.0" y="398.0" width="730.0" height="70.0" rx="15.0" class="panel2"/>
+<text x="130.0" y="426.0" class="label" text-anchor="start">Motor interface</text>
+<text x="130.0" y="450.0" class="small" text-anchor="start">MD10C drivers command five 12 V DC gearmotors</text>
+<text x="790.0" y="440.0" class="cyan" text-anchor="end">PWM + DIR</text>
+<path class="arrow" d="M460,468 L460,491"/>
+<rect x="95.0" y="494.0" width="730.0" height="70.0" rx="15.0" class="panel2"/>
+<text x="130.0" y="522.0" class="label" text-anchor="start">Mechanism</text>
+<text x="130.0" y="546.0" class="small" text-anchor="start">2 prismatic joints, 1 revolute joint, spring-loaded gripper</text>
+<text x="790.0" y="536.0" class="cyan" text-anchor="end">3-DOF harvester</text>
+</svg>

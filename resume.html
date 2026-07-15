@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Résumé — Andrew M. Jones</title>
+  <meta name="description" content="Résumé of Andrew M. Jones, robotics systems engineer — embedded systems, real-time control, and hardware/software debugging. Downloadable PDF plus a skimmable on-page summary." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="assets/css/site.css" />
+  <script>
+    (function () { try { var t = localStorage.getItem("theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
+  </script>
+  <script defer src="assets/js/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="sheet">
+    <header class="titleblock">
+      <div class="tb-id">
+        <a class="tb-name" href="index.html" style="text-decoration:none">Andrew M. Jones</a>
+        <span class="tb-role">Robotics Systems Engineer</span>
+      </div>
+      <nav class="tb-nav" aria-label="Primary">
+        <a href="index.html"><span class="n">00</span>Home</a>
+        <a href="index.html#work"><span class="n">01</span>Work</a>
+        <a href="about.html"><span class="n">02</span>About</a>
+        <a href="resume.html" aria-current="page"><span class="n">03</span>Résumé</a>
+        <a href="contact.html"><span class="n">04</span>Contact</a>
+        <button class="tt" type="button" data-theme-toggle aria-pressed="false" title="Toggle light / dark">
+          <span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Dark</span>
+        </button>
+      </nav>
+    </header>
+
+    <main id="main" class="wrap">
+
+      <!-- ===== INTRO + DOWNLOAD ===== -->
+      <section class="proj-hero">
+        <span class="eyebrow">Résumé</span>
+        <h1>Andrew M. Jones — Robotics Systems Engineer</h1>
+        <p class="lede">
+          Embedded systems integration, real-time control, and hardware/software debugging. Experienced in optimizing
+          system latency, developing multi-microcontroller architectures, and validating performance through
+          first-principles analysis.
+        </p>
+        <div class="dl-row">
+          <a class="btn primary" href="assets/docs/andrew-jones-resume.pdf">Download PDF <span class="arw" aria-hidden="true">↓</span></a>
+          <a class="btn" href="contact.html">Contact</a>
+        </div>
+      </section>
+
+      <!-- ===== A · SELECTED PROJECTS ===== -->
+      <section class="section" aria-labelledby="a-h">
+        <div class="section-head">
+          <span class="section-num">A</span>
+          <h2 class="section-title" id="a-h">Selected projects</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <h3><a href="pose-estimation.html">Computer-Vision Pose Estimation</a> — M.S. thesis (solo)</h3>
+          <ul>
+            <li>Built an overhead-camera localization system giving a mobile robot absolute world-frame pose — fisheye calibration, ArUco detection, and an iterative PnP solve, with an <strong>original analytical world-coordinate derivation</strong>.</li>
+            <li>Designed a four-MCU pipeline (Raspberry&nbsp;Pi → ESP32 → ESP32 → STM32) over SPI, ESP-NOW, and UART; profiled it to <strong>~87&nbsp;ms end-to-end</strong>.</li>
+            <li>Validated against ground truth at <strong>2.6&nbsp;mm average accuracy</strong>.</li>
+          </ul>
+
+          <h3><a href="robotic-arm.html">4.5-DOF Color-Sorting Robotic Arm</a> — ME 507 (team of 3)</h3>
+          <ul>
+            <li>Owned the motion subsystem and its electronics: selected the <strong>TMC429 motion-control chips</strong> and stepper drivers and contributed to the custom STM32H7 controller PCB.</li>
+            <li>Wrote the TMC429 SPI driver, radians-to-steps command layer, and a waypoint-based trajectory engine; debugged multi-day SPI bring-up on the oscilloscope.</li>
+          </ul>
+
+          <h3><a href="autonomous-mobile-robot.html">Autonomous Mobile Robot</a> — ME 405 (solo)</h3>
+          <ul>
+            <li>Built an <strong>observer-based state estimator</strong> (7-state, RK4) and a custom heading-and-speed control law in MicroPython on an STM32.</li>
+            <li>Cut course time from <strong>~30&nbsp;s to ~11&nbsp;s — fastest of 12 teams</strong> — using a live Bluetooth telemetry and plotting toolchain to drive the tuning.</li>
+          </ul>
+
+          <h3><a href="harvester.html">3-DOF Print-Harvesting Robot</a> — ME 423 (programming lead)</h3>
+          <ul>
+            <li>Wrote the full embedded control stack on a Raspberry&nbsp;Pi: cubic-spline trajectories, per-motor PI/PID, and telemetry for a five-motor, <strong>21-waypoint</strong> harvest sequence.</li>
+            <li>Diagnosed unstable motor behavior to a software-PWM timing mismatch on the oscilloscope and fixed it with <strong>hardware-timed (DMA) PWM</strong> via pigpio.</li>
+          </ul>
+
+          <h3>Additional — Autonomous Vehicle Programming (AI)</h3>
+          <ul>
+            <li>Trained and deployed <strong>YOLO</strong> object-recognition models in a <strong>ROS2</strong> environment on scale autonomous vehicles for line-following and sign recognition; worked with LiDAR and ultrasonic sensors; tested in simulation before deployment.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ===== B · SKILLS ===== -->
+      <section class="section" aria-labelledby="b-h">
+        <div class="section-head">
+          <span class="section-num">B</span>
+          <h2 class="section-title" id="b-h">Skills</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <table class="spec-table matrix">
+          <tbody>
+            <tr><td>Embedded &amp; systems</td><td>Real-time control, STM32 · ESP32 · Raspberry Pi, microcontrollers, HW/SW integration, oscilloscope &amp; signal analysis</td></tr>
+            <tr><td>Programming</td><td>Python, MicroPython, C (working knowledge), MATLAB</td></tr>
+            <tr><td>Robotics &amp; perception</td><td>ROS2, OpenCV, YOLO (Ultralytics), sensor integration (IMU, LiDAR, encoders)</td></tr>
+            <tr><td>Modeling &amp; analysis</td><td>MATLAB (system dynamics), Matplotlib / Tkinter, system requirements, latency analysis, FMEA</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ===== C · EDUCATION & EXPERIENCE ===== -->
+      <section class="section" aria-labelledby="c-h">
+        <div class="section-head">
+          <span class="section-num">C</span>
+          <h2 class="section-title" id="c-h">Education &amp; experience</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <a class="section-meta" href="about.html">Full detail →</a>
+        </div>
+        <div class="timeline">
+          <div class="item">
+            <div class="when">2026</div>
+            <div class="what"><h3>B.S. + M.S., Mechanical Engineering (concurrent)</h3><div class="org">Cal Poly, San Luis Obispo · GPA 3.9</div></div>
+          </div>
+          <div class="item">
+            <div class="when">2025</div>
+            <div class="what"><h3>Sales Engineering Intern</h3><div class="org">Air Treatment Corporation</div></div>
+          </div>
+          <div class="item">
+            <div class="when">2024</div>
+            <div class="what"><h3>Hydroelectric Plant Intern</h3><div class="org">Northern California Power Agency</div></div>
+          </div>
+          <div class="item">
+            <div class="when">2023</div>
+            <div class="what"><h3>CNC Machine Operator</h3><div class="org">AirPoint Precision Inc.</div></div>
+          </div>
+          <div class="item">
+            <div class="when">2021–2022</div>
+            <div class="what"><h3>Material Handler</h3><div class="org">OmniCubed Inc.</div></div>
+          </div>
+        </div>
+        <div class="dl-row">
+          <a class="btn primary" href="assets/docs/andrew-jones-resume.pdf">Download full résumé (PDF) <span class="arw" aria-hidden="true">↓</span></a>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="footer-tb">
+      <span class="cell">A. Jones — Robotics Systems Engineer</span>
+      <span class="cell">Sheet 07 · Résumé</span>
+      <span class="cell">2026</span>
+      <span class="cell">© <span id="year"></span> Andrew M. Jones</span>
+    </footer>
+  </div>
+</body>
+</html>

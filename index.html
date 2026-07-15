@@ -3,131 +3,227 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Andrew Jones — Robotics Portfolio</title>
-  <meta name="description" content="Andrew Jones robotics portfolio covering embedded systems, real-time control, autonomous mobile robots, and mechatronics projects." />
+  <title>Andrew M. Jones — Robotics Systems Engineer</title>
+  <meta name="description" content="Andrew M. Jones is a robotics systems engineer working across embedded firmware, real-time control, state estimation, and sensing-to-actuation integration — validated on real hardware." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="site.js"></script>
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="assets/css/site.css" />
+  <script>
+    /* set theme before paint to avoid a flash */
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <script defer src="assets/js/site.js"></script>
 </head>
 <body>
-  <header class="nav">
-    <a class="brand" href="./">Andrew Jones</a>
-    <nav class="navlinks" aria-label="Primary navigation">
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-  <main>
-    <section class="hero">
-      <div class="hero-text">
-        <h1>Robotics Engineer</h1>
-        <p class="subhead">Embedded Systems • Real-Time Control • Mechatronics</p>
-        <p class="lede">
-          I build robotic systems that connect control theory, embedded software, sensors, and hardware debugging.
-          My work focuses on reliable motion, real-time performance, and practical implementation on physical machines.
-        </p>
-        <div class="cta-row">
-          <a class="btn primary" href="#projects">View projects</a>
-          <a class="btn" href="mailto:andrewmj@outlook.com">Contact me</a>
+  <div class="sheet">
+    <header class="titleblock">
+      <div class="tb-id">
+        <span class="tb-name">Andrew M. Jones</span>
+        <span class="tb-role">Robotics Systems Engineer</span>
+      </div>
+      <nav class="tb-nav" aria-label="Primary">
+        <a href="index.html" aria-current="page"><span class="n">00</span>Home</a>
+        <a href="#work"><span class="n">01</span>Work</a>
+        <a href="about.html"><span class="n">02</span>About</a>
+        <a href="resume.html"><span class="n">03</span>Résumé</a>
+        <a href="contact.html"><span class="n">04</span>Contact</a>
+        <button class="tt" type="button" data-theme-toggle aria-pressed="false" title="Toggle light / dark">
+          <span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Dark</span>
+        </button>
+      </nav>
+    </header>
+
+    <main id="main" class="wrap">
+
+      <!-- ===== HERO ===== -->
+      <section class="hero" aria-labelledby="hero-h">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow">Portfolio · Rev 2026</span>
+            <h1 id="hero-h">Robotics systems that hold up on <span class="u">real hardware</span>.</h1>
+            <p class="lede">
+              I work across the whole stack — embedded firmware, real-time control, state estimation, and the
+              sensing-to-actuation links between them — and I back every claim with measured results on physical machines.
+            </p>
+            <div class="cta-row">
+              <a class="btn primary" href="#work">View work <span class="arw" aria-hidden="true">→</span></a>
+              <a class="btn" href="resume.html">Résumé</a>
+            </div>
+          </div>
+          <figure class="figure">
+            <span class="figtag">Fig. 01 — Thesis test rig</span>
+            <img src="assets/img/pose-estimation/rig-hero.jpg" width="1800" height="1350"
+                 alt="Overhead camera on a wooden stand looking down at a marker-covered track, with a Romi robot carrying an ArUco marker cube." />
+            <figcaption>Overhead fisheye camera → ArUco markers → world-frame pose, relayed wirelessly to the robot.</figcaption>
+          </figure>
         </div>
-      </div>
-      <a class="hero-card hero-card-link" href="harvester.html" aria-label="Read the 3-DOF Robotic Harvester case study">
-        <div class="pill">Featured case study</div>
-        <h2 class="card-title">3-DOF Robotic Harvester</h2>
-        <p class="card-body">
-          Manipulator control, trajectory generation, and oscilloscope-based PWM debugging for a multi-motor robotic system.
-        </p>
-        <span class="btn small">Read the case study →</span>
-      </a>
-    </section>
+      </section>
 
-    <section id="projects" class="section">
-      <div class="section-head">
-        <h2>Featured Robotics Projects</h2>
-        <p class="muted">Selected work in autonomous systems, embedded control, communication, and system integration.</p>
-      </div>
+      <!-- ===== FEATURED ===== -->
+      <section class="section" id="featured" aria-labelledby="feat-h">
+        <div class="section-head">
+          <span class="section-num">A</span>
+          <h2 class="section-title" id="feat-h">Featured</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <span class="section-meta">M.S. thesis · Solo</span>
+        </div>
 
-      <div class="grid">
-        <a class="project project-link" href="harvester.html" aria-label="Open the 3-DOF Robotic Harvester System case study">
-          <div class="project-top">
-            <h3>3-DOF Robotic Harvester System</h3>
-            <p class="muted">Embedded control • Trajectory planning • Hardware debugging</p>
+        <article class="feature">
+          <div class="fig-side">
+            <img src="assets/img/pose-estimation/rig-hero.jpg" width="1800" height="1350"
+                 alt="The pose-estimation test rig: overhead camera stand, marker board, and Romi robot." />
           </div>
-          <p>
-            Built the control stack for a multi-motor manipulator, including trajectory planning, encoder feedback,
-            and closed-loop motor control. When the robot could not achieve the commanded behavior through tuning alone,
-            I used an oscilloscope to compare requested PWM against the actual signal, identified a timing mismatch in the
-            software-timed PWM library, switched libraries, verified the duty cycle, and deployed the corrected controller.
-          </p>
-          <div class="tags">
-            <span>Raspberry Pi</span><span>PWM</span><span>DMA</span><span>Controls</span><span>Mechatronics</span>
+          <div class="body">
+            <span class="role">Localization · Embedded comms · Validation</span>
+            <h3>Computer-Vision Pose Estimation for Mobile Robots</h3>
+            <p class="muted">
+              An overhead camera gives a differential-drive robot absolute world-frame position to replace drift-prone
+              dead reckoning — solved end to end, from fisheye optics and the PnP math to a four-MCU wireless link,
+              then validated against ground truth.
+            </p>
+            <div class="metrics" aria-label="Key results">
+              <div class="metric"><span class="val">2.6<span class="unit">mm</span></span><span class="lbl">Avg accuracy</span></div>
+              <div class="metric"><span class="val">~87<span class="unit">ms</span></span><span class="lbl">End-to-end latency</span></div>
+              <div class="metric"><span class="val">4</span><span class="lbl">MCUs linked</span></div>
+            </div>
+            <a class="btn primary" href="pose-estimation.html">Read case study <span class="arw" aria-hidden="true">→</span></a>
           </div>
-          <span class="btn small">Open case study</span>
-        </a>
-
-        <a class="project project-link" href="https://term-project-me-405.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer" aria-label="View the Autonomous Mobile Robot project documentation">
-          <div class="project-top">
-            <h3>Autonomous Mobile Robot</h3>
-            <p class="muted">Real-time control • State estimation • Embedded optimization</p>
-          </div>
-          <p>
-            Developed an autonomous mobile robot using MicroPython and STM32 hardware, with IMU, encoder, and proximity
-            sensor feedback. The controller used observer-based state estimation and model-based control while meeting a
-            25 ms loop deadline.
-          </p>
-          <div class="tags">
-            <span>MicroPython</span><span>STM32</span><span>IMU</span><span>Encoders</span><span>Estimation</span>
-          </div>
-          <span class="btn small">View project documentation</span>
-        </a>
-
-        <article class="project">
-          <div class="project-top">
-            <h3>Robot Visual Tracking & Communication</h3>
-            <p class="muted">Master's thesis • Distributed embedded systems</p>
-          </div>
-          <p>
-            Designed and profiled a Raspberry Pi, ESP32, and STM32 communication pipeline for real-time perception-to-control
-            data flow, with emphasis on latency measurement, protocol comparison, and hardware integration.
-          </p>
-          <div class="tags">
-            <span>Raspberry Pi</span><span>ESP32</span><span>STM32</span><span>SPI/UART</span><span>ESP-NOW</span>
-          </div>
-          <a class="btn small disabled" href="#" aria-disabled="true">Case study in progress</a>
         </article>
 
-        <article class="project">
-          <div class="project-top">
-            <h3>Battle Bot Team Lead</h3>
-            <p class="muted">Systems engineering • Manufacturing • Team leadership</p>
+        <div class="dataflow">
+          <span class="label">System dataflow — perception to control</span>
+          <div class="chain" role="img" aria-label="Data path: Raspberry Pi to ESP32 transmitter over SPI; ESP32 transmitter to ESP32 receiver over ESP-NOW wireless; ESP32 receiver to STM32 over UART.">
+            <div class="node"><span class="n-name">Raspberry Pi</span><span class="n-sub">Vision · PnP</span></div>
+            <div class="link" aria-hidden="true"><span class="lk-proto">SPI</span><span class="lk-arw">→</span></div>
+            <div class="node"><span class="n-name">ESP32</span><span class="n-sub">Transmitter</span></div>
+            <div class="link" aria-hidden="true"><span class="lk-proto">ESP-NOW</span><span class="lk-arw">→</span></div>
+            <div class="node"><span class="n-name">ESP32</span><span class="n-sub">Receiver</span></div>
+            <div class="link" aria-hidden="true"><span class="lk-proto">UART</span><span class="lk-arw">→</span></div>
+            <div class="node"><span class="n-name">STM32</span><span class="n-sub">On robot</span></div>
           </div>
-          <p>
-            Led system-level design and integration for a 250-lb combat robot, coordinating mechanical and electrical
-            subsystems, design tradeoffs, manufacturing planning, and final assembly for competition.
-          </p>
-          <div class="tags">
-            <span>Leadership</span><span>Integration</span><span>DFM</span><span>Trade studies</span>
+        </div>
+      </section>
+
+      <!-- ===== SELECTED WORK ===== -->
+      <section class="section" id="work" aria-labelledby="work-h">
+        <div class="section-head">
+          <span class="section-num">B</span>
+          <h2 class="section-title" id="work-h">Selected work</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <span class="section-meta">4 projects</span>
+        </div>
+
+        <div class="index-list">
+
+          <a class="index-item" href="pose-estimation.html">
+            <span class="idx">01</span>
+            <span class="thumb"><img src="assets/img/pose-estimation/rig-hero.jpg" width="1800" height="1350" alt="" loading="lazy" /></span>
+            <span class="meta">
+              <h3>Computer-Vision Pose Estimation</h3>
+              <span class="role">Solo · M.S. thesis</span>
+              <p>Overhead camera, ArUco markers, and a Perspective-n-Point solution give a mobile robot absolute world-frame position, relayed over a four-MCU wireless link.</p>
+              <span class="tags"><span>OpenCV</span><span>PnP</span><span>ESP-NOW</span><span>STM32</span><span>Python</span></span>
+            </span>
+            <span class="go">
+              <span class="stat">2.6&nbsp;mm<small>Avg accuracy</small></span>
+              <span class="arw" aria-hidden="true">→</span>
+            </span>
+          </a>
+
+          <a class="index-item" href="robotic-arm.html">
+            <span class="idx">02</span>
+            <span class="thumb"><img src="assets/img/robotic-arm/arm-hero.jpg" width="1396" height="1106" alt="" loading="lazy" /></span>
+            <span class="meta">
+              <h3>4.5-DOF Color-Sorting Arm</h3>
+              <span class="role">Team of 3 · Motion + electronics</span>
+              <p>I owned the motion subsystem and its electronics — selecting the TMC429 motion-control chips and stepper drivers, writing the SPI drivers and trajectory engine, on a custom PCB.</p>
+              <span class="tags"><span>STM32H7</span><span>TMC429</span><span>SPI</span><span>Steppers</span><span>PCB</span></span>
+            </span>
+            <span class="go">
+              <span class="stat">4.5<small>Deg. of freedom</small></span>
+              <span class="arw" aria-hidden="true">→</span>
+            </span>
+          </a>
+
+          <a class="index-item" href="autonomous-mobile-robot.html">
+            <span class="idx">03</span>
+            <span class="thumb"><img src="assets/img/autonomous-mobile-robot/romi-labeled.jpg" width="1074" height="720" alt="" loading="lazy" /></span>
+            <span class="meta">
+              <h3>Autonomous Mobile Robot</h3>
+              <span class="role">Solo · State estimation</span>
+              <p>A Romi robot runs an obstacle course on an observer-based state estimator and a custom heading-and-speed control law — tuned from ~30&nbsp;s down to ~11&nbsp;s.</p>
+              <span class="tags"><span>MicroPython</span><span>STM32</span><span>Observer</span><span>IMU</span><span>Bluetooth</span></span>
+            </span>
+            <span class="go">
+              <span class="stat">~11&nbsp;s<small>Fastest of 12</small></span>
+              <span class="arw" aria-hidden="true">→</span>
+            </span>
+          </a>
+
+          <a class="index-item" href="harvester.html">
+            <span class="idx">04</span>
+            <span class="thumb"><img src="assets/img/harvester/harvester-system.jpg" width="1166" height="874" alt="" loading="lazy" /></span>
+            <span class="meta">
+              <h3>3-DOF Print-Harvesting Robot</h3>
+              <span class="role">Team of 5 · Programming lead</span>
+              <p>Embedded control for a five-motor manipulator that clears finished prints off a 3D-printer bed — cubic-spline trajectories and closed-loop hardware-timed PWM on a Raspberry Pi.</p>
+              <span class="tags"><span>Raspberry Pi</span><span>Python</span><span>PI/PID</span><span>pigpio PWM</span></span>
+            </span>
+            <span class="go">
+              <span class="stat">5<small>DC motors</small></span>
+              <span class="arw" aria-hidden="true">→</span>
+            </span>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== CAPABILITIES ===== -->
+      <section class="section" id="capabilities" aria-labelledby="cap-h">
+        <div class="section-head">
+          <span class="section-num">C</span>
+          <h2 class="section-title" id="cap-h">Capabilities</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <a class="section-meta" href="about.html">Full matrix →</a>
+        </div>
+        <div class="caps">
+          <div class="cap"><div class="k">Real-time control</div><div class="v">PID / PI loops, observer design, trajectory planning, gain tuning, loop-timing budgets</div></div>
+          <div class="cap"><div class="k">Embedded systems</div><div class="v">STM32 · ESP32 · Raspberry Pi; C, MicroPython, drivers, FreeRTOS tasks</div></div>
+          <div class="cap"><div class="k">Perception &amp; estimation</div><div class="v">OpenCV, ArUco / PnP, sensor fusion, state observers, calibration</div></div>
+          <div class="cap"><div class="k">Comms &amp; integration</div><div class="v">SPI · UART · ESP-NOW, telemetry pipelines, oscilloscope debugging</div></div>
+        </div>
+      </section>
+
+      <!-- ===== CONTACT BAND ===== -->
+      <section class="section" id="contact" aria-labelledby="contact-h">
+        <div class="band">
+          <div>
+            <span class="eyebrow">Open to robotics · controls · mechatronics roles</span>
+            <h2 id="contact-h">Let's build something that moves.</h2>
+            <p class="lede">I recently earned a concurrent B.S./M.S. in Mechanical Engineering at Cal Poly. I'm after roles where control theory meets real hardware.</p>
           </div>
-          <a class="btn small disabled" href="#" aria-disabled="true">Case study in progress</a>
-        </article>
-      </div>
-    </section>
+          <div class="cta-row">
+            <a class="btn primary" href="mailto:andrewmj@outlook.com">Email <span class="arw" aria-hidden="true">→</span></a>
+            <a class="btn" href="contact.html">Contact</a>
+          </div>
+        </div>
+      </section>
 
-    <section id="contact" class="section">
-      <div class="section-head">
-        <h2>Contact</h2>
-        <p class="muted">I'm available to discuss robotics, embedded systems, and controls work.</p>
-      </div>
-      <div class="contact">
-        <div class="contact-row"><span class="label">Email</span><a href="mailto:andrewmj@outlook.com">andrewmj@outlook.com</a></div>
-        <div class="contact-row"><span class="label">LinkedIn</span><a href="https://www.linkedin.com/in/andrew-jones-aa05802b1/" target="_blank" rel="noopener noreferrer">linkedin.com/in/andrew-jones-aa05802b1</a></div>
-      </div>
-    </section>
-  </main>
+    </main>
 
-  <footer class="footer">
-    <span class="muted">© <span id="year"></span> Andrew Jones</span>
-  </footer>
+    <footer class="footer-tb">
+      <span class="cell">A. Jones — Robotics Systems Engineer</span>
+      <span class="cell">Sheet 01 / 01</span>
+      <span class="cell">Cal Poly · San Luis Obispo</span>
+      <span class="cell">© <span id="year"></span> Andrew M. Jones</span>
+    </footer>
+  </div>
 </body>
 </html>

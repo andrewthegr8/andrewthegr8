@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Computer-Vision Pose Estimation — Andrew M. Jones</title>
+  <meta name="description" content="M.S. thesis: an overhead fisheye camera gives a mobile robot absolute world-frame position via ArUco markers and a Perspective-n-Point solution, relayed over a four-microcontroller wireless link. 2.6 mm accuracy, ~87 ms end-to-end." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="assets/css/site.css" />
+  <script>
+    (function () { try { var t = localStorage.getItem("theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
+  </script>
+  <script defer src="assets/js/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="sheet">
+    <header class="titleblock">
+      <div class="tb-id">
+        <a class="tb-name" href="index.html" style="text-decoration:none">Andrew M. Jones</a>
+        <span class="tb-role">Robotics Systems Engineer</span>
+      </div>
+      <nav class="tb-nav" aria-label="Primary">
+        <a href="index.html"><span class="n">00</span>Home</a>
+        <a href="index.html#work" aria-current="page"><span class="n">01</span>Work</a>
+        <a href="about.html"><span class="n">02</span>About</a>
+        <a href="resume.html"><span class="n">03</span>Résumé</a>
+        <a href="contact.html"><span class="n">04</span>Contact</a>
+        <button class="tt" type="button" data-theme-toggle aria-pressed="false" title="Toggle light / dark">
+          <span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Dark</span>
+        </button>
+      </nav>
+    </header>
+
+    <main id="main" class="wrap">
+
+      <p class="breadcrumb"><a href="index.html#work">Work</a><span class="sep">/</span>01 — Pose Estimation</p>
+
+      <!-- ===== HERO ===== -->
+      <section class="proj-hero">
+        <span class="eyebrow">Master's thesis · Solo · Cal Poly 2026</span>
+        <h1>Computer-Vision Pose Estimation for Planar Mobile Robots</h1>
+        <p class="lede">
+          An overhead fisheye camera gives a differential-drive robot absolute world-frame position — replacing
+          drift-prone dead reckoning. I built the pipeline end to end: fisheye calibration, ArUco detection, a
+          Perspective-<em>n</em>-Point solve, an original analytical world-coordinate derivation, and a
+          four-microcontroller wireless link that delivers the estimate to the robot — then validated it against ground truth.
+        </p>
+        <dl class="spec-block">
+          <div class="row"><dt>Role</dt><dd>Solo — design, build, test</dd></div>
+          <div class="row"><dt>Focus</dt><dd>Localization · Embedded comms · Experimental validation</dd></div>
+          <div class="row"><dt>Stack</dt><dd>Python · OpenCV · ESP-NOW · STM32 · FreeRTOS</dd></div>
+        </dl>
+
+        <figure class="figure proj-hero-fig" style="margin-top:2rem">
+          <span class="figtag">Fig. 01 — Test rig &amp; frames</span>
+          <img src="assets/img/pose-estimation/coordinate-frames.png" width="721" height="710"
+               alt="Lab setup: an overhead camera on a wooden stand (camera frame X-c) looks down at a marker-covered board on a table, with the world frame axes X-w, Y-w, Z-w drawn at one corner." />
+          <figcaption>The system maps a marker's position in the image to the world frame defined on the track. A single overhead camera covers the full ~36&nbsp;×&nbsp;72&nbsp;in workspace.</figcaption>
+        </figure>
+
+        <div class="metrics" style="margin-top:2rem" aria-label="Headline results">
+          <div class="metric"><span class="val">2.6<span class="unit">mm</span></span><span class="lbl">Avg accuracy</span></div>
+          <div class="metric"><span class="val">~87<span class="unit">ms</span></span><span class="lbl">End-to-end latency</span></div>
+          <div class="metric"><span class="val">2.75<span class="unit">px</span></span><span class="lbl">Reprojection error</span></div>
+          <div class="metric"><span class="val">4</span><span class="lbl">MCUs linked</span></div>
+        </div>
+
+        <figure class="figure mid" style="margin-top:2.2rem">
+          <span class="figtag">Demo — real-time tracking</span>
+          <div class="video" data-yt="CT9yKjzfANE" role="button" tabindex="0" aria-label="Play the pose-estimation demonstration video">
+            <img src="assets/img/pose-estimation/yt-CT9yKjzfANE.jpg" width="480" height="360" loading="lazy" alt="Video thumbnail: the Romi robot tracked in real time by the overhead camera system." />
+            <span class="play" aria-hidden="true"></span>
+          </div>
+          <figcaption>Live demonstration of the robot tracked in real time.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ===== A · PROBLEM ===== -->
+      <section class="section" aria-labelledby="a-h">
+        <div class="section-head">
+          <span class="section-num">A</span>
+          <h2 class="section-title" id="a-h">The problem</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <p>
+            The "Romi" robots used in Cal Poly's mechatronics course navigate by dead reckoning — wheel odometry fused
+            with an IMU. That estimate drifts: wheels slip, and the magnetometer is disturbed by the motors and nearby
+            metal. There was no external source of <strong>absolute</strong> position to correct it.
+          </p>
+          <p>
+            The goal was a low-cost, portable system that hands each robot its true pose in a fixed world frame, accurate
+            enough for course maneuvers, fast enough for closed-loop use, and simple enough for students to set up and tear
+            down repeatedly. The design targets it had to answer to:
+          </p>
+          <ul>
+            <li><strong>±5&nbsp;mm</strong> accuracy at a <strong>≥10&nbsp;Hz</strong> update rate (inherited from a prior senior project)</li>
+            <li>Track <strong>≥6</strong> robots simultaneously</li>
+            <li>Keep the robot's onboard MCU an <strong>STM32</strong> (course requirement)</li>
+            <li>Reuse existing hardware; portable, no permanent lab install</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ===== B · APPROACH / ROLE ===== -->
+      <section class="section" aria-labelledby="b-h">
+        <div class="section-head">
+          <span class="section-num">B</span>
+          <h2 class="section-title" id="b-h">My approach &amp; the decisions</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <span class="section-meta">Solo</span>
+        </div>
+        <div class="prose">
+          <p>
+            This was a solo thesis, so every architecture choice was mine to make and defend. The system is deliberately
+            framed as a <strong>robotics-systems</strong> problem — localization, coordinate transforms, embedded
+            communication, and experimental validation — with computer vision as one subsystem inside it.
+          </p>
+          <h3>Sensing &amp; math</h3>
+          <ul>
+            <li><strong>External overhead camera</strong> over onboard-only sensing — an absolute reference can't drift.</li>
+            <li>A <strong>single fisheye camera</strong> (Raspberry&nbsp;Pi Camera Module&nbsp;3 Wide, 120° FOV) to cover the whole track from one mount, accepting lens distortion as the tradeoff.</li>
+            <li><strong>Kannala–Brandt fisheye calibration</strong> from ~40 checkerboard images to recover the intrinsics and distortion model.</li>
+            <li>Detect <strong>ArUco</strong> markers, then solve the Perspective-<em>n</em>-Point problem with the iterative (Levenberg–Marquardt) solver plus RANSAC to reject outliers from imperfect undistortion.</li>
+            <li>An <strong>original analytical derivation</strong> recovers a marker's world X/Y from a single PnP solution and its known height — so the system doesn't re-solve PnP for every estimate.</li>
+          </ul>
+        </div>
+
+        <div class="split" style="margin-top:1.8rem">
+          <figure class="figure">
+            <span class="figtag">Fig. 02 — Calibration</span>
+            <img src="assets/img/pose-estimation/calibration-corners.jpg" width="1400" height="803" loading="lazy"
+                 alt="Fisheye calibration board with every detected ArUco corner marked, used to solve the camera intrinsics and distortion." />
+            <figcaption>Detected marker corners across the board — the correspondences that drive calibration and the PnP solve.</figcaption>
+          </figure>
+          <div class="prose">
+            <h3>Communication</h3>
+            <p>To get the estimate onto the robot with low latency, I built a four-MCU pipeline:</p>
+            <div class="chain" role="img" aria-label="Raspberry Pi to ESP32 transmitter over SPI; ESP32 transmitter to ESP32 receiver over ESP-NOW wireless; ESP32 receiver to STM32 over UART.">
+              <div class="node"><span class="n-name">Raspberry Pi</span><span class="n-sub">Vision · PnP</span></div>
+              <div class="link" aria-hidden="true"><span class="lk-proto">SPI</span><span class="lk-arw">→</span></div>
+              <div class="node"><span class="n-name">ESP32</span><span class="n-sub">Transmitter</span></div>
+              <div class="link" aria-hidden="true"><span class="lk-proto">ESP-NOW</span><span class="lk-arw">→</span></div>
+              <div class="node"><span class="n-name">ESP32</span><span class="n-sub">Receiver</span></div>
+              <div class="link" aria-hidden="true"><span class="lk-proto">UART</span><span class="lk-arw">→</span></div>
+              <div class="node"><span class="n-name">STM32</span><span class="n-sub">On robot</span></div>
+            </div>
+            <p style="margin-top:1rem">
+              <strong>ESP-NOW</strong> for its low, connectionless latency; <strong>UART</strong> into the robot because
+              it's already what the course teaches. The vision app is threaded Python on the Pi (picamera2 / libcamera / spidev);
+              the ESP32s run C under FreeRTOS with tasks, queues, and an event-group mutex.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== C · ITERATION ===== -->
+      <section class="section" aria-labelledby="c-h">
+        <div class="section-head">
+          <span class="section-num">C</span>
+          <h2 class="section-title" id="c-h">What I changed, and why</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <ul>
+            <li><strong>Regular lens → fisheye.</strong> I started with a standard lens, but to fit the whole table in frame it had to sit so high that the ArUco markers came out too low-resolution to detect reliably. Switching to a fisheye lens kept the entire table in view at usable resolution — trading lens distortion, which I could calibrate out, for the marker resolution I needed.</li>
+            <li><strong>Homography → analytical PnP.</strong> My first pixel-to-pose method was a homography, which assumes every marker lies in the same plane as the fixed corner markers. But the marker riding on the Romi sits higher than the floor markers, so that flat-world assumption produced systematically wrong poses — which motivated the current analytical, PnP-based transform that accounts for marker height.</li>
+            <li><strong>Fisheye calibration was finicky.</strong> OpenCV would reject one image, but which one it blamed depended on the rest of the set — so fixing one failure just surfaced another. I scripted the dataset selection to converge on a working set of 42 images. It's sufficient but not perfect: some residual distortion survives at the frame edges (I'm not convinced perfect fisheye calibration is even achievable), and that residual is the leading source of pose error.</li>
+          </ul>
+        </div>
+
+        <div class="figrow" style="margin-top:1.6rem">
+          <figure class="figure">
+            <span class="figtag">Fig. 03a — Raw fisheye</span>
+            <img src="assets/img/pose-estimation/undistort-before.jpg" width="900" height="506" loading="lazy"
+                 alt="Raw wide-angle fisheye frame of the track, with visible barrel distortion bowing the straight table edges." />
+            <figcaption>Raw 120° frame — straight edges bow outward.</figcaption>
+          </figure>
+          <figure class="figure">
+            <span class="figtag">Fig. 03b — Undistorted</span>
+            <img src="assets/img/pose-estimation/undistort-after.jpg" width="900" height="506" loading="lazy"
+                 alt="The same frame after applying the calibrated fisheye undistortion, with edges straightened; slight residual distortion remains at the corners." />
+            <figcaption>After calibrated undistortion — with residual error surviving at the corners.</figcaption>
+          </figure>
+        </div>
+
+        <div class="note">
+          <span class="note-k">Candid finding</span>
+          <p>
+            Against a static robot, the vision estimate matched ground truth well. But on a <strong>moving</strong> robot the
+            estimate visibly diverged from odometry — traceable to end-to-end latency (the estimate lags the robot) compounded
+            by odometry drift. I documented it as a real limitation rather than smoothing it over, and it directly shapes the
+            "what's next" below.
+          </p>
+        </div>
+      </section>
+
+      <!-- ===== D · RESULTS ===== -->
+      <section class="section" aria-labelledby="d-h">
+        <div class="section-head">
+          <span class="section-num">D</span>
+          <h2 class="section-title" id="d-h">Results</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <span class="section-meta">Measured</span>
+        </div>
+        <div class="prose">
+          <p>
+            Static accuracy came in at a few millimetres, and latency landed near the real-time budget. It did not quite hit
+            the aggressive ±5&nbsp;mm target, but the error is comfortably inside the ~±35&nbsp;mm tolerance of the tightest
+            course maneuver — so the system is usable for its intended job.
+          </p>
+        </div>
+
+        <table class="spec-table">
+          <thead><tr><th>Metric</th><th>Result</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Accuracy — table plane (Z = 0)</td><td class="num">2.6 mm avg · 4.2 mm max</td><td>11 markers</td></tr>
+            <tr><td>Accuracy — robot height (Z = −130 mm)</td><td class="num">3.9 mm avg · 6.0 mm max</td><td>off-plane test</td></tr>
+            <tr><td>Reprojection error</td><td class="num">2.75 px mean</td><td>±0.25 px run-to-run, 44 corners</td></tr>
+            <tr><td>Vision latency</td><td class="num">82 ms mean</td><td>73–168 ms; ArUco ≈70%, undistort ≈30%</td></tr>
+            <tr><td>Communication latency</td><td class="num">≈4.6 ms</td><td>SPI 6 MHz · ESP-NOW · UART 115200</td></tr>
+            <tr><td>End-to-end</td><td class="num">≈87 ms</td><td>vision + comms</td></tr>
+          </tbody>
+        </table>
+
+        <figure class="figure mid" style="margin-top:1.6rem">
+          <span class="figtag">Fig. 04 — Latency</span>
+          <div class="plot-canvas"><img src="assets/diagrams/pose-estimation/latency-boxplot.svg" loading="lazy"
+               alt="Box-and-whisker plot of the vision pipeline latency, centered near 82 milliseconds with a long upper tail toward 168 ms." /></div>
+          <figcaption>Vision-pipeline latency distribution — median ≈82&nbsp;ms with a long upper tail.</figcaption>
+        </figure>
+
+        <div class="gallery" style="margin-top:1rem">
+          <figure class="figure">
+            <span class="figtag">Fig. 05 — Reprojection</span>
+            <div class="plot-canvas"><img src="assets/diagrams/pose-estimation/reprojection-error.svg" loading="lazy"
+                 alt="Plot comparing detected marker corners against reprojected corners across the image, showing sub-pixel agreement." /></div>
+            <figcaption>Detected vs. reprojected corners.</figcaption>
+          </figure>
+          <figure class="figure">
+            <span class="figtag">Fig. 06 — Off-plane</span>
+            <div class="plot-canvas"><img src="assets/diagrams/pose-estimation/offset-plane-compare.svg" loading="lazy"
+                 alt="Scatter of true versus estimated marker positions on the offset plane at robot height, clustered tightly around the ground-truth points." /></div>
+            <figcaption>True vs. estimated position at robot height.</figcaption>
+          </figure>
+        </div>
+
+        <figure class="figure mid" style="margin-top:1rem">
+          <span class="figtag">Fig. 07 — Dynamic test</span>
+          <div class="plot-canvas"><img src="assets/diagrams/pose-estimation/path-compare-square.svg" loading="lazy"
+               alt="Overlaid paths of the camera-estimated position and wheel odometry as the robot drives a square-wave pattern; the two agree early and separate over time." /></div>
+          <figcaption>Camera vs. odometry as the robot drives a square-wave pattern.</figcaption>
+        </figure>
+
+        <figure class="figure mid" style="margin-top:1rem">
+          <span class="figtag">Fig. 08 — Deviation vs. time</span>
+          <div class="plot-canvas"><img src="assets/diagrams/pose-estimation/difference-vs-time.svg" loading="lazy"
+               alt="Difference between camera and odometry estimates plotted against time, growing roughly linearly with a fitted trend line." /></div>
+          <figcaption>Camera–odometry difference grows with time…</figcaption>
+        </figure>
+
+        <figure class="figure mid" style="margin-top:1rem">
+          <span class="figtag">Fig. 09 — Deviation vs. velocity</span>
+          <div class="plot-canvas"><img src="assets/diagrams/pose-estimation/difference-vs-velocity.svg" loading="lazy"
+               alt="Difference between camera and odometry estimates plotted against robot velocity, increasing with speed." /></div>
+          <figcaption>…and with robot velocity — the latency signature.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ===== E · NEXT ===== -->
+      <section class="section" aria-labelledby="e-h">
+        <div class="section-head">
+          <span class="section-num">E</span>
+          <h2 class="section-title" id="e-h">What I'd build next</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <ul>
+            <li><strong>Cut the latency, in software and hardware.</strong> ArUco detection is ~70% of vision time — a smaller search region, lower-res detection pass, or a GPU/NEON path would help there. Image-capture latency, though, is floored by the camera's rolling shutter, which reads the sensor line-by-line at a fixed frame rate; a global-shutter camera and a faster Pi would lift that ceiling more than any code tuning.</li>
+            <li><strong>Compensate motion.</strong> A predictive filter (e.g. constant-velocity forward-projection or a small Kalman step) would counter the lag that shows up on moving robots.</li>
+            <li><strong>Handle corner distortion</strong> explicitly, since residual fisheye error at the edges is the dominant accuracy limit.</li>
+          </ul>
+          <p style="margin-top:1.4rem">
+            <a class="btn" href="assets/docs/andrew-jones-thesis.pdf">Read the full thesis (PDF) <span class="arw" aria-hidden="true">→</span></a>
+          </p>
+        </div>
+
+        <nav class="proj-nav" aria-label="More projects">
+          <a href="index.html#work"><span class="dir">Index</span><span class="t">← All work</span></a>
+          <a class="next" href="robotic-arm.html"><span class="dir">Next project</span><span class="t">4.5-DOF Color-Sorting Arm →</span></a>
+        </nav>
+      </section>
+
+    </main>
+
+    <footer class="footer-tb">
+      <span class="cell">A. Jones — Robotics Systems Engineer</span>
+      <span class="cell">Sheet 02 · Pose Estimation</span>
+      <span class="cell">M.S. Thesis · 2026</span>
+      <span class="cell">© <span id="year"></span> Andrew M. Jones</span>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="570" viewBox="0 0 1000 570" role="img">
+  <defs>
+    <style>
+      .bg { fill: #07111f; }
+      .panel { fill: #0a1628; stroke: #223957; stroke-width: 1.4; }
+      .panel2 { fill: #0f2138; stroke: #315273; stroke-width: 1.4; }
+      .panel3 { fill: #102b35; stroke: #2c6d73; stroke-width: 1.4; }
+      .chip { fill: #0f2138; stroke: #315273; stroke-width: 1.2; }
+      .labelBg { fill: #07111f; stroke: #5eead4; stroke-width: 1.1; }
+      .title { fill: #f7fbff; font: 700 25px Arial, sans-serif; }
+      .subtitle { fill: #b8cbe0; font: 500 14px Arial, sans-serif; }
+      .label { fill: #e7f0fa; font: 700 13px Arial, sans-serif; }
+      .small { fill: #b8cbe0; font: 500 12px Arial, sans-serif; }
+      .tiny { fill: #93acc8; font: 500 10.5px Arial, sans-serif; }
+      .mono { fill: #e9f3ff; font: 700 13px Consolas, Menlo, monospace; }
+      .cyan { fill: #5eead4; }
+      .blue { fill: #60a5fa; }
+      .green { fill: #86efac; }
+      .pink { fill: #fb7185; }
+      .amber { fill: #fbbf24; }
+      .gridline { stroke: #203650; stroke-width: 1; }
+      .axis { stroke: #6f8cab; stroke-width: 1.5; }
+      .arrow { stroke: #b8cbe0; stroke-width: 2.2; fill: none; marker-end: url(#arrow); stroke-linecap: round; stroke-linejoin: round; }
+      .arrowCyan { stroke: #5eead4; stroke-width: 2.6; fill: none; marker-end: url(#arrowCyan); stroke-linecap: round; stroke-linejoin: round; }
+      .wire { stroke: #6f8cab; stroke-width: 2.0; fill: none; marker-end: url(#arrow); stroke-linecap: round; stroke-linejoin: round; }
+      .lineCyan { stroke: #5eead4; stroke-width: 3.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .lineBlue { stroke: #60a5fa; stroke-width: 3.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3.5 L0,7 Z" fill="#b8cbe0" />
+    </marker>
+    <marker id="arrowCyan" markerWidth="11" markerHeight="11" refX="9.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3.5 L0,7 Z" fill="#5eead4" />
+    </marker>
+  </defs>
+  <rect class="bg" width="100%" height="100%" rx="18"/>
+<text x="500.0" y="42.0" class="title" text-anchor="middle">Programmed Joint-Space Sequence</text>
+<text x="500.0" y="66.0" class="subtitle" text-anchor="middle">Horizontal travel, vertical travel, wrist rotation, and gripper angle are coordinated by waypoint</text>
+<rect x="45.0" y="105.0" width="700.0" height="420.0" rx="15.0" class="panel"/>
+<line x1="75.0" y1="125" x2="75.0" y2="455" class="gridline"/>
+<line x1="165.7" y1="125" x2="165.7" y2="455" class="gridline"/>
+<line x1="256.4" y1="125" x2="256.4" y2="455" class="gridline"/>
+<line x1="347.1" y1="125" x2="347.1" y2="455" class="gridline"/>
+<line x1="437.9" y1="125" x2="437.9" y2="455" class="gridline"/>
+<line x1="528.6" y1="125" x2="528.6" y2="455" class="gridline"/>
+<line x1="619.3" y1="125" x2="619.3" y2="455" class="gridline"/>
+<line x1="710.0" y1="125" x2="710.0" y2="455" class="gridline"/>
+<line x1="75" y1="125" x2="710" y2="125" class="gridline"/>
+<line x1="75" y1="191" x2="710" y2="191" class="gridline"/>
+<line x1="75" y1="257" x2="710" y2="257" class="gridline"/>
+<line x1="75" y1="323" x2="710" y2="323" class="gridline"/>
+<line x1="75" y1="389" x2="710" y2="389" class="gridline"/>
+<line x1="75" y1="455" x2="710" y2="455" class="gridline"/>
+<line x1="75" y1="455" x2="710" y2="455" class="axis"/>
+<line x1="75" y1="455" x2="75" y2="125" class="axis"/>
+<text x="392.0" y="505.0" class="tiny" text-anchor="middle">Horizontal joint travel, d1 (in)</text>
+<text x="28" y="300" class="tiny" text-anchor="middle" transform="rotate(-90 28 300)">Vertical joint travel, d2 (in)</text>
+<path d="M379.8,432.2 L379.8,432.2 L168.1,432.2 L151.2,432.2 L151.2,432.2 L108.9,318.4 L108.9,193.3 L379.8,193.3 L379.8,193.3 L379.8,318.4 L676.1,318.4 L676.1,147.8 L676.1,318.4 L379.8,318.4 L379.8,193.3 L379.8,193.3 L218.9,193.3 L218.9,290.0 L218.9,290.0 L379.8,290.0 L379.8,290.0" class="lineCyan"/>
+<circle cx="379.8" cy="432.2" r="6" class="cyan"/>
+<circle cx="379.8" cy="432.2" r="4.5" class="blue"/>
+<circle cx="168.1" cy="432.2" r="4.5" class="blue"/>
+<circle cx="151.2" cy="432.2" r="4.5" class="blue"/>
+<circle cx="151.2" cy="432.2" r="6" class="cyan"/>
+<circle cx="108.9" cy="318.4" r="4.5" class="blue"/>
+<circle cx="108.9" cy="193.3" r="4.5" class="blue"/>
+<circle cx="379.8" cy="193.3" r="4.5" class="blue"/>
+<circle cx="379.8" cy="193.3" r="6" class="cyan"/>
+<circle cx="379.8" cy="318.4" r="4.5" class="blue"/>
+<circle cx="676.1" cy="318.4" r="4.5" class="blue"/>
+<circle cx="676.1" cy="147.8" r="6" class="cyan"/>
+<circle cx="676.1" cy="318.4" r="4.5" class="blue"/>
+<circle cx="379.8" cy="318.4" r="4.5" class="blue"/>
+<circle cx="379.8" cy="193.3" r="4.5" class="blue"/>
+<circle cx="379.8" cy="193.3" r="4.5" class="blue"/>
+<circle cx="218.9" cy="193.3" r="4.5" class="blue"/>
+<circle cx="218.9" cy="290.0" r="4.5" class="blue"/>
+<circle cx="218.9" cy="290.0" r="6" class="cyan"/>
+<circle cx="379.8" cy="290.0" r="4.5" class="blue"/>
+<circle cx="379.8" cy="290.0" r="6" class="cyan"/>
+<rect x="365.8" y="389.2" width="28" height="21" rx="10" class="labelBg"/>
+<text x="379.8" y="404.2" class="tiny" text-anchor="middle">0</text>
+<rect x="101.2" y="395.2" width="28" height="21" rx="10" class="labelBg"/>
+<text x="115.2" y="410.2" class="tiny" text-anchor="middle">4</text>
+<rect x="365.8" y="150.3" width="28" height="21" rx="10" class="labelBg"/>
+<text x="379.8" y="165.3" class="tiny" text-anchor="middle">8</text>
+<rect x="659.1" y="104.8" width="34" height="21" rx="10" class="labelBg"/>
+<text x="676.1" y="119.8" class="tiny" text-anchor="middle">11</text>
+<rect x="194.9" y="309.0" width="34" height="21" rx="10" class="labelBg"/>
+<text x="211.9" y="324.0" class="tiny" text-anchor="middle">18</text>
+<rect x="397.8" y="287.0" width="34" height="21" rx="10" class="labelBg"/>
+<text x="414.8" y="302.0" class="tiny" text-anchor="middle">20</text>
+<rect x="770.0" y="105.0" width="185.0" height="420.0" rx="15.0" class="panel2"/>
+<text x="862.0" y="140.0" class="label" text-anchor="middle">Key states</text>
+<circle cx="800" cy="174" r="5" class="cyan"/>
+<text x="816.0" y="178.0" class="small" text-anchor="start">0: home</text>
+<circle cx="800" cy="222" r="5" class="cyan"/>
+<text x="816.0" y="226.0" class="small" text-anchor="start">4: grip plate</text>
+<circle cx="800" cy="270" r="5" class="cyan"/>
+<text x="816.0" y="274.0" class="small" text-anchor="start">8: flip plate</text>
+<circle cx="800" cy="318" r="5" class="cyan"/>
+<text x="816.0" y="322.0" class="small" text-anchor="start">11: flex plate</text>
+<circle cx="800" cy="366" r="5" class="cyan"/>
+<text x="816.0" y="370.0" class="small" text-anchor="start">18: release</text>
+<circle cx="800" cy="414" r="5" class="cyan"/>
+<text x="816.0" y="418.0" class="small" text-anchor="start">20: close gripper</text>
+<text x="862.0" y="476.0" class="tiny" text-anchor="middle">Path plotted from</text>
+<text x="862.0" y="496.0" class="tiny" text-anchor="middle">programmed joint targets</text>
+</svg>

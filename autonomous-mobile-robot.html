@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autonomous Mobile Robot — Andrew M. Jones</title>
+  <meta name="description" content="ME 405: a Pololu Romi robot that autonomously runs an obstacle course, built solo on an observer-based state estimator and a custom control law — tuned from ~30 s to ~11 s, fastest of 12 teams." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="assets/css/site.css" />
+  <script>
+    (function () { try { var t = localStorage.getItem("theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
+  </script>
+  <script defer src="assets/js/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="sheet">
+    <header class="titleblock">
+      <div class="tb-id">
+        <a class="tb-name" href="index.html" style="text-decoration:none">Andrew M. Jones</a>
+        <span class="tb-role">Robotics Systems Engineer</span>
+      </div>
+      <nav class="tb-nav" aria-label="Primary">
+        <a href="index.html"><span class="n">00</span>Home</a>
+        <a href="index.html#work" aria-current="page"><span class="n">01</span>Work</a>
+        <a href="about.html"><span class="n">02</span>About</a>
+        <a href="resume.html"><span class="n">03</span>Résumé</a>
+        <a href="contact.html"><span class="n">04</span>Contact</a>
+        <button class="tt" type="button" data-theme-toggle aria-pressed="false" title="Toggle light / dark">
+          <span class="tt-ico" aria-hidden="true">◐</span><span class="tt-label">Dark</span>
+        </button>
+      </nav>
+    </header>
+
+    <main id="main" class="wrap">
+
+      <p class="breadcrumb"><a href="index.html#work">Work</a><span class="sep">/</span>03 — Autonomous Mobile Robot</p>
+
+      <!-- ===== HERO ===== -->
+      <section class="proj-hero">
+        <span class="eyebrow">ME 405 Mechatronics · Solo · Cal Poly</span>
+        <h1>Autonomous Mobile Robot</h1>
+        <p class="lede">
+          A Pololu Romi robot that drives an obstacle course on its own — line-following, hitting checkpoints, and dodging
+          a wall — as fast as possible. I built it solo around an <strong>observer-based state estimator</strong> and a
+          <strong>custom heading-and-speed control law</strong>, then tuned it from ~30&nbsp;s down to ~11&nbsp;s: the
+          fastest of twelve teams.
+        </p>
+        <dl class="spec-block">
+          <div class="row"><dt>Role</dt><dd>Solo — firmware, estimation, control, tooling</dd></div>
+          <div class="row"><dt>Focus</dt><dd>State estimation · Real-time control · Telemetry</dd></div>
+          <div class="row"><dt>Stack</dt><dd>MicroPython · STM32L476 · IMU · Bluetooth</dd></div>
+        </dl>
+
+        <figure class="figure proj-hero-fig" style="margin-top:2rem">
+          <span class="figtag">Fig. 01 — The Romi</span>
+          <img src="assets/img/autonomous-mobile-robot/romi-labeled.jpg" width="1074" height="720"
+               alt="The assembled Romi robot with components labeled: STM32 Nucleo, Bluetooth module, status LEDs, left and right motor/wheel, IMU, reflectance sensor array, and bump sensor." />
+          <figcaption>The Romi platform — STM32 Nucleo, BNO055 IMU, quadrature encoders, reflectance array, and a Bluetooth link for live telemetry.</figcaption>
+        </figure>
+
+        <div class="metrics" style="margin-top:2rem" aria-label="Headline results">
+          <div class="metric"><span class="val">~11<span class="unit">s</span></span><span class="lbl">Best run · from ~30 s</span></div>
+          <div class="metric"><span class="val">1st</span><span class="lbl">of 12 teams</span></div>
+          <div class="metric"><span class="val">7</span><span class="lbl">Observer states</span></div>
+          <div class="metric"><span class="val">25<span class="unit">ms</span></span><span class="lbl">Control loop</span></div>
+        </div>
+
+        <figure class="figure mid" style="margin-top:2.2rem">
+          <span class="figtag">Demo — course run</span>
+          <div class="video" data-yt="yyV9BpyjOOg" role="button" tabindex="0" aria-label="Play the autonomous course run video">
+            <img src="assets/img/autonomous-mobile-robot/yt-yyV9BpyjOOg.jpg" width="480" height="360" loading="lazy" alt="Video thumbnail: the Romi robot running the course." />
+            <span class="play" aria-hidden="true"></span>
+          </div>
+          <figcaption>The Romi running the obstacle course autonomously.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ===== A · PROBLEM ===== -->
+      <section class="section" aria-labelledby="a-h">
+        <div class="section-head">
+          <span class="section-num">A</span>
+          <h2 class="section-title" id="a-h">The problem</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <p>
+            The ME 405 term project puts a low-cost <strong>Pololu Romi</strong> (STM32L476 Nucleo, MicroPython) through an
+            obstacle course: follow a line to a junction, then drive a sequence of checkpoints while avoiding obstacles and a
+            wall. The single metric that matters is <strong>completion time</strong> — so the whole design question is how to
+            know where the robot is, accurately and cheaply, and drive it hard without losing control.
+          </p>
+        </div>
+      </section>
+
+      <!-- ===== B · ROLE & DECISIONS ===== -->
+      <section class="section" aria-labelledby="b-h">
+        <div class="section-head">
+          <span class="section-num">B</span>
+          <h2 class="section-title" id="b-h">My approach &amp; the decisions</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <span class="section-meta">Solo</span>
+        </div>
+        <div class="prose">
+          <h3>State estimation</h3>
+          <p>
+            The core is an <strong>observer-based state estimator</strong> — a seven-state model (wheel velocities, heading,
+            wheel positions, and X/Y) built on a first-order motor model. I ran it in <strong>scalar form with RK4</strong>
+            integration rather than matrix operations, specifically to fit the STM32's small RAM and hold the real-time
+            budget. Because the model takes motor voltage as an input, I chose LiPo AA cells with built-in regulators for a
+            stable supply — a hardware choice made to serve the estimator.
+          </p>
+          <h3>Control law</h3>
+          <p>
+            I wrote a <strong>custom heading-and-speed control law</strong> instead of using textbook Pure Pursuit (and wrote
+            up the tradeoffs). Heading error comes from the dot and cross products between the heading vector and the vector
+            to the target; the robot slows for large heading errors and as it nears a waypoint, so it doesn't overshoot.
+          </p>
+        </div>
+
+        <div class="split" style="margin-top:1.8rem">
+          <figure class="figure">
+            <span class="figtag">Fig. 02 — Control geometry</span>
+            <div class="plot-canvas"><img src="assets/diagrams/autonomous-mobile-robot/drive-geometry.png" width="535" height="480" loading="lazy"
+                 alt="Vector diagram of the heading-error geometry: current pose C, target point P, error vector E, heading psi, and heading-error angle alpha." /></div>
+            <figcaption>Heading-error geometry — current pose C, target P, error vector E, heading ψ, heading error α.</figcaption>
+          </figure>
+          <div class="prose">
+            <h3>Real-time firmware &amp; tooling</h3>
+            <ul>
+              <li>Tightened the hot path with <strong><code>@micropython.native</code></strong> methods, pre-allocated buffers passed through the task share, and a dedicated garbage-collector task run once per loop.</li>
+              <li>Built a full <strong>PC-side telemetry toolchain</strong> over Bluetooth — a custom binary packet, a live Tkinter dashboard, CSV export, and an auto-plotting engine for run analysis.</li>
+            </ul>
+          </div>
+        </div>
+
+        <figure class="figure mid" style="margin-top:1.4rem">
+          <span class="figtag">Fig. 03 — Live telemetry</span>
+          <div class="plot-canvas"><img src="assets/img/autonomous-mobile-robot/telemetry-gui.png" width="1183" height="567" loading="lazy"
+               alt="Screenshot of the live Romi data GUI showing predicted versus actual wheel velocities, heading, and pose during a run." /></div>
+          <figcaption>The live dashboard — predicted vs. actual velocity, heading, and pose, streamed over Bluetooth at 460800 baud.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ===== C · ITERATION ===== -->
+      <section class="section" aria-labelledby="c-h">
+        <div class="section-head">
+          <span class="section-num">C</span>
+          <h2 class="section-title" id="c-h">What I changed, and why</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <ul>
+            <li><strong>Constant speed didn't work.</strong> At a fixed speed the robot overshot waypoints and backtracked, especially on tight turns. I added speed modulation by heading accuracy and distance-to-target — the biggest single time saver.</li>
+            <li><strong>The IMU lied near the wall.</strong> Close to the metal wall the magnetometer gave nonsense headings, and with the observer's aggressive gains the estimate blew up. I disabled IMU feedback in that zone (heading from wheel velocity alone), then re-enabled it once the BNO055's self-calibration settled across runs.</li>
+            <li><strong>Bluetooth corruption showed up as spikes.</strong> Dropped/garbled packets put spikes in the plots, so I added a median-absolute-deviation outlier filter in the analysis engine.</li>
+            <li><strong>Loop timing.</strong> Trial and error put the smallest reliable task period at <strong>25&nbsp;ms</strong>; I raised it to 30&nbsp;ms for the final demo so unoptimized code wouldn't jitter the timestep.</li>
+          </ul>
+        </div>
+
+        <div class="figrow" style="margin-top:1.6rem">
+          <figure class="figure">
+            <span class="figtag">Fig. 04 — IMU glitch</span>
+            <div class="plot-canvas"><img src="assets/img/autonomous-mobile-robot/imu-badheading.png" width="1000" height="559" loading="lazy"
+                 alt="Plot of a corrupted heading estimate spiking to nonsensical values as the robot passes near the wall." /></div>
+            <figcaption>Heading goes nonsensical near the wall…</figcaption>
+          </figure>
+          <figure class="figure">
+            <span class="figtag">Fig. 05 — IMU disabled there</span>
+            <div class="plot-canvas"><img src="assets/img/autonomous-mobile-robot/imu-off.png" width="1000" height="592" loading="lazy"
+                 alt="Plot showing the observer heading behaving when IMU feedback is disabled in the wall zone." /></div>
+            <figcaption>…so I lean on wheel-derived heading in that zone.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ===== D · RESULTS ===== -->
+      <section class="section" aria-labelledby="d-h">
+        <div class="section-head">
+          <span class="section-num">D</span>
+          <h2 class="section-title" id="d-h">Results</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <span class="section-meta">Fastest of 12</span>
+        </div>
+        <div class="prose">
+          <p>
+            Iterative tuning against real run data pulled course time from roughly 30&nbsp;seconds to about
+            <strong>11&nbsp;seconds — the fastest of the twelve teams</strong>. The estimator's predicted velocities and
+            heading track the measured signals closely, which is what made driving that aggressively survivable.
+          </p>
+        </div>
+
+        <table class="spec-table">
+          <thead><tr><th>Metric</th><th>Value</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Course completion time</td><td class="num">~30 s → ~11 s</td><td>fastest of 12 teams</td></tr>
+            <tr><td>Control loop period</td><td class="num">25 ms → 30 ms</td><td>min reliable → final demo</td></tr>
+            <tr><td>Observer</td><td class="num">7 states · 5 meas · 2 in</td><td>RK4, scalar form</td></tr>
+            <tr><td>Telemetry link</td><td class="num">460800 baud</td><td>19-field binary packet</td></tr>
+          </tbody>
+        </table>
+
+        <figure class="figure mid" style="margin-top:1.4rem">
+          <span class="figtag">Fig. 06 — Improved run</span>
+          <div class="plot-canvas"><img src="assets/img/autonomous-mobile-robot/course-run2.png" width="1071" height="651" loading="lazy"
+               alt="Four-panel run analysis: left and right wheel velocity with true, predicted, and command traces overlapping closely; heading true vs predicted; and the robot's path through the course with setpoints marked." /></div>
+          <figcaption>A tuned run — predicted (observer) traces sit on top of the measured signals, and the path hits every setpoint.</figcaption>
+        </figure>
+
+        <div class="figrow" style="margin-top:1rem">
+          <figure class="figure">
+            <span class="figtag">Fig. 07 — Early run</span>
+            <div class="plot-canvas"><img src="assets/img/autonomous-mobile-robot/course-run1.png" width="1200" height="671" loading="lazy"
+                 alt="Run analysis from an earlier, slower configuration for comparison." /></div>
+            <figcaption>An earlier, slower configuration.</figcaption>
+          </figure>
+          <figure class="figure">
+            <span class="figtag">Fig. 08 — Velocity tuning</span>
+            <div class="plot-canvas"><img src="assets/img/autonomous-mobile-robot/velocity-tuning.png" width="1200" height="671" loading="lazy"
+                 alt="Velocity setpoint tracking used to find areas for improvement during tuning." /></div>
+            <figcaption>Velocity-setpoint tracking drove the tuning.</figcaption>
+          </figure>
+        </div>
+
+      </section>
+
+      <!-- ===== E · NEXT ===== -->
+      <section class="section" aria-labelledby="e-h">
+        <div class="section-head">
+          <span class="section-num">E</span>
+          <h2 class="section-title" id="e-h">What I'd build next</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <ul>
+            <li><strong>System-ID the motor model.</strong> Its parameters came from theory plus basic testing; a proper identification would sharpen the estimator and let me push gains further with less risk.</li>
+            <li><strong>Simplify the control law.</strong> The final law works but grew complex under time pressure — I'd re-derive a cleaner version now that I know which terms actually earn their keep.</li>
+            <li><strong>Fuse the IMU properly</strong> near the wall instead of switching it off — a confidence-weighted update would keep the heading correction where it's trustworthy.</li>
+          </ul>
+          <p style="margin-top:1.4rem">
+            <a class="btn" href="https://term-project-me-405.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer">Full project documentation <span class="arw" aria-hidden="true">→</span></a>
+          </p>
+        </div>
+
+        <nav class="proj-nav" aria-label="More projects">
+          <a href="robotic-arm.html"><span class="dir">← Previous</span><span class="t">4.5-DOF Color-Sorting Arm</span></a>
+          <a class="next" href="harvester.html"><span class="dir">Next project</span><span class="t">3-DOF Print-Harvesting Robot →</span></a>
+        </nav>
+      </section>
+
+    </main>
+
+    <footer class="footer-tb">
+      <span class="cell">A. Jones — Robotics Systems Engineer</span>
+      <span class="cell">Sheet 04 · Autonomous Mobile Robot</span>
+      <span class="cell">ME 405 · 2025</span>
+      <span class="cell">© <span id="year"></span> Andrew M. Jones</span>
+    </footer>
+  </div>
+</body>
+</html>
