@@ -43,13 +43,13 @@
         <span class="eyebrow">ME 507 Mechatronics · Team of 3 · Cal Poly</span>
         <h1>4.5-DOF Color-Sorting Robotic Arm</h1>
         <p class="lede">
-          A semi-autonomous arm: you joystick the end effector over a foam block, then it takes over — reading the
-          block's color and sorting it into the matching bin. Four stepper-driven joints and a servo gripper, run by a
-          custom STM32 controller. <strong>I owned the motion subsystem and its electronics.</strong>
+          A semi-autonomous roboticarm: you use the joystick to move the end effector over a foam block, then it takes over at the press of a button. It reads the
+          block's color and places it into the appropriate bin. It's powered by four stepper-driven joints and a servo gripper and run by a
+          custom STM32 controller. <strong>I designed the motion subsystem and selected its electronics.</strong>
         </p>
         <dl class="spec-block">
           <div class="row"><dt>My role</dt><dd>Motion &amp; actuation — firmware + electronics</dd></div>
-          <div class="row"><dt>Team</dt><dd>3 (teammates: joystick / state machine, color sensing)</dd></div>
+          <div class="row"><dt>Team</dt><dd>3 (teammates were in charge of the joystick and color sensing hardware/software)</dd></div>
           <div class="row"><dt>Stack</dt><dd>STM32H7 · C · TMC429 · SPI · custom PCB</dd></div>
         </dl>
 
@@ -67,10 +67,132 @@
           <div class="metric"><span class="val">4</span><span class="lbl">Stepper joints</span></div>
         </div>
 
+      <!-- ===== A · PROBLEM ===== -->
+      <section class="section" aria-labelledby="a-h">
+        <div class="section-head">
+          <span class="section-num">A</span>
+          <h2 class="section-title" id="a-h">The problem</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <p>
+            The ME 507 term project was to build a mechatronic device that interfaces with multiple sensors and actuators using a custom PCB
+            My team built a robotic arm that sorts foam blocks by color. It runs semi-autonomously; the operator
+            levels the arm and presses the joystick to zero the joints, drives the end effector over a block using a jostick, then presses a
+            button to hand off control to the arm. The arm reads the block's color with an end-effector sensor, closes the gripper,
+            and moves the block to the appropriate bin for that color.
+          </p>
+          <div class="split narrow" style="margin-top:1.6rem">
+            <figure class="figure">
+              <span class="figtag">Fig. 02 — CAD</span>
+              <img src="assets/img/robotic-arm/arm-cad.jpg" width="652" height="702" loading="lazy"
+                   alt="Isometric CAD render of the four-joint robotic arm with a gripper end effector mounted on a boxy base." />
+              <figcaption>Isometric CAD — four stepper joints plus a servo gripper.</figcaption>
+            </figure>
+            <div class="prose">
+              <h3>System at a glance</h3>
+              <ul>
+                <li>Four stepper-driven joints + a servo-actuated gripper — <strong>4.5 DOF</strong></li>
+                <li>End-effector color sensor (TCS34725) over I²C</li>
+                <li>Handheld joystick controller for manual positioning</li>
+                <li>Custom STM32H7 control PCB that drives everything</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== B · ROLE & DECISIONS ===== -->
+      <section class="section" aria-labelledby="b-h">
+        <div class="section-head">
+          <span class="section-num">B</span>
+          <h2 class="section-title" id="b-h">My role &amp; design decisions</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <span class="section-meta">Motion &amp; electronics</span>
+        </div>
+        <div class="prose">
+          <p>
+            On the three-person team I owned the <strong>motion and actuation subsystem end to end</strong>. I selected the electronics
+            that drive the joints and wrote the firmware that commands them. (Teammates owned the joystick/state machine and
+            color-sensing pipelines.)
+          </p>
+          <h3>Electronics &amp; component selection</h3>
+          <ul>
+            <li>Selected stepper motors based on predicted static and dynamic load torques.</li>
+            <li>Selected the <strong>TMC429 motion-control chips</strong> and appropriately sized stepper drivers.</li>
+            <li>Integrated these into our <strong>custom control PCB</strong> (designed in Fusion 360 Electronics, fabricated by JLCPCB). This board carries the STM32 microcontroller, drivers, and handles power distribution.</li>
+          </ul>
+          <h3>Motion firmware</h3>
+          <ul>
+            <li>Wrote a <strong>TMC429 SPI driver</strong> facilitate the deployment of vendor provided drivers, a basic enable / safe-state control driver to interface with the stepper drivers, and a radians-to-steps command layer.</li>
+            <li>Built a <strong>trajectory / waypoint engine</strong>. Motions are declared as waypoint structs (per-joint targets plus gripper state), so adding a new path is a data change, not new control code.</li>
+          </ul>
+        </div>
+
+        <div class="split" style="margin-top:1.8rem">
+          <figure class="figure">
+            <span class="figtag">Fig. 03 — Custom PCB</span>
+            <img src="assets/img/robotic-arm/arm-pcb.jpg" width="1300" height="807" loading="lazy"
+                 alt="The custom green control PCB, silkscreen reading '6-DOF Robot Arm Controller', with the STM32 microcontroller, motion-control chips, and per-motor driver ICs populated." />
+            <figcaption>The custom controller — STM32, TMC429 motion controllers, and per-joint stepper drivers.</figcaption>
+          </figure>
+          <div class="note">
+            <span class="note-k">Key decision — offload the ramping</span>
+            <p>
+              Rather than compute full inverse kinematics on the MCU, we command <strong>position targets</strong> and let the
+              TMC429's onboard ramp generator handle acceleration and deceleration in hardware. It cuts the real-time
+              computational load and simplifies the code needed on the MCU while keeping the arm's motion smooth. The trade-off is coordinating joints at a waypoint level instead of
+              a continuous Cartesian path. We also selected the <strong>STM32H7</strong> for its double-precision FPU and higher clock speed
+              over an STM32F4 for marginal added cost.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== C · ITERATION ===== -->
+      <section class="section" aria-labelledby="c-h">
+        <div class="section-head">
+          <span class="section-num">C</span>
+          <h2 class="section-title" id="c-h">Obstacles and Solutions</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="split" style="margin-top:0.4rem">
+          <div class="prose">
+            <ul>
+              <li><strong>TMC429 SPI bring-up was a nightmare.</strong> Getting the STM32 talking to the TMC429s took multiple days. Selecting the right SPI settings was complex, the clock speed for the motion controllers was initially configured incorrectly, and there was a bug in the (unofficial) vendor provided firmware. The SPI bug was found using an oscilloscope to watch the actual SPI signals.
+              <li>After the TMC429 chips were up and running, the motors refused to move. This was traced to a bug where each motor driver's <strong>reset line was being held high (instead of low)</strong>, keeping the chips in reset.</li>
+              <li><strong>Six colors → four.</strong> The classifier computes hue for six colors, but in testing red, yellow, green, and blue separated most reliably. So, the final demo committed to those four rather than chase noisy edge cases.</li>
+
+            </ul>
+          </div>
+          <figure class="figure">
+            <span class="figtag">Fig. 04 — SPI debug</span>
+            <img src="assets/img/robotic-arm/arm-scope.jpg" width="1300" height="975" loading="lazy"
+                 alt="Oscilloscope screen capturing a digital signal on the SPI bus during bring-up of the motion-control chips." />
+            <figcaption>Scope capture from the SPI bring-up of the TMC429 motion controllers.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ===== D · RESULTS ===== -->
+      <section class="section" aria-labelledby="d-h">
+        <div class="section-head">
+          <span class="section-num">D</span>
+          <h2 class="section-title" id="d-h">Results</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="prose">
+          <p>
+            The arm successfully demonstrated the full loop end to end with joystick-assisted block selection, color detection,
+            gripping, and autonomous sorting. Formal cycle-time and repeatability metrics weren't recorded, but the arm reliably and
+            consistently sorted blocks in our demo.
+          </p>
+        </div>
+
         <div class="figrow" style="margin-top:2.2rem">
           <figure class="figure">
             <span class="figtag">Demo — RGB sort</span>
-            <div class="video" data-yt="xEQVzRaxtds" role="button" tabindex="0" aria-label="Play the RGB color-sorting demo video">
+            <div class="video" data-yt="tl6NA75vG2Q" role="button" tabindex="0" aria-label="Play the RGB color-sorting demo video">
               <img src="assets/img/robotic-arm/yt-xEQVzRaxtds.jpg" width="480" height="360" loading="lazy" alt="Video thumbnail: the robotic arm sorting colored blocks." />
               <span class="play" aria-hidden="true"></span>
             </div>
@@ -87,154 +209,20 @@
         </div>
       </section>
 
-      <!-- ===== A · PROBLEM ===== -->
-      <section class="section" aria-labelledby="a-h">
-        <div class="section-head">
-          <span class="section-num">A</span>
-          <h2 class="section-title" id="a-h">The problem</h2>
-          <span class="section-rule" aria-hidden="true"></span>
-        </div>
-        <div class="prose">
-          <p>
-            The ME 507 term project was to build a mechatronic device that senses and acts on the physical world. Our team
-            built a robotic arm that identifies foam blocks by color and sorts them. It runs semi-autonomously: the operator
-            levels the arm and presses the joystick to zero the joints, drives the end effector over a block, and presses
-            again — from there the arm reads the block's color with an end-effector sensor, closes the gripper, and moves the
-            block to the bin for that color.
-          </p>
-          <div class="split narrow" style="margin-top:1.6rem">
-            <figure class="figure">
-              <span class="figtag">Fig. 02 — CAD</span>
-              <img src="assets/img/robotic-arm/arm-cad.jpg" width="652" height="702" loading="lazy"
-                   alt="Isometric CAD render of the four-joint robotic arm with a gripper end effector mounted on a boxy base." />
-              <figcaption>Isometric CAD — four stepper joints plus a servo gripper.</figcaption>
-            </figure>
-            <div class="prose">
-              <h3>System at a glance</h3>
-              <ul>
-                <li>Four stepper-driven joints + a servo-actuated gripper — <strong>4.5 DOF</strong></li>
-                <li>End-effector color sensor (TCS34725) over I²C</li>
-                <li>Handheld joystick controller for manual positioning</li>
-                <li>Custom STM32H7 control PCB driving everything</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== B · ROLE & DECISIONS ===== -->
-      <section class="section" aria-labelledby="b-h">
-        <div class="section-head">
-          <span class="section-num">B</span>
-          <h2 class="section-title" id="b-h">My role &amp; the decisions</h2>
-          <span class="section-rule" aria-hidden="true"></span>
-          <span class="section-meta">Motion &amp; electronics</span>
-        </div>
-        <div class="prose">
-          <p>
-            On a three-person team I owned the <strong>motion and actuation subsystem end to end</strong> — the electronics
-            that drive the joints and the firmware that commands them. (Teammates owned the joystick/state machine and the
-            color-sensing pipeline.)
-          </p>
-          <h3>Electronics &amp; component selection</h3>
-          <ul>
-            <li>Selected the actuation hardware: the <strong>TMC429 motion-control chips</strong> and the stepper drivers that sit under them.</li>
-            <li>Contributed to the <strong>custom control PCB</strong> (designed in Fusion 360 Electronics, fabricated by JLCPCB) — the board that carries the STM32, drivers, and power.</li>
-            <li>Sized the power stage and reserved headroom on the regulator for a wide input range.</li>
-          </ul>
-          <h3>Motion firmware</h3>
-          <ul>
-            <li>Wrote the <strong>TMC429 SPI driver</strong>, stepper enable / safe-state control, and the radians-to-steps command layer.</li>
-            <li>Built a <strong>trajectory / waypoint engine</strong>: motions are declared as waypoint structs (per-joint targets plus gripper state), so adding a new path is a data change, not new control code.</li>
-          </ul>
-        </div>
-
-        <div class="split" style="margin-top:1.8rem">
-          <figure class="figure">
-            <span class="figtag">Fig. 03 — Custom PCB</span>
-            <img src="assets/img/robotic-arm/arm-pcb.jpg" width="1300" height="807" loading="lazy"
-                 alt="The custom green control PCB, silkscreen reading '6-DOF Robot Arm Controller', with the STM32 microcontroller, motion-control chips, and per-motor driver ICs populated." />
-            <figcaption>The custom controller — STM32, TMC429 motion controllers, and per-joint stepper drivers.</figcaption>
-          </figure>
-          <div class="note">
-            <span class="note-k">Key decision — offload the ramping</span>
-            <p>
-              Rather than compute full inverse kinematics on the MCU, I command <strong>position targets</strong> and let the
-              TMC429's onboard ramp generator handle acceleration and deceleration in hardware. It cuts the real-time
-              computational load and keeps motion smooth — the trade is coordinating joints at the waypoint level instead of
-              a continuous Cartesian path. I also chose the <strong>STM32H7</strong> (double-precision FPU, clock headroom)
-              over an F4 for marginal added cost.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== C · ITERATION ===== -->
-      <section class="section" aria-labelledby="c-h">
-        <div class="section-head">
-          <span class="section-num">C</span>
-          <h2 class="section-title" id="c-h">What I changed, and why</h2>
-          <span class="section-rule" aria-hidden="true"></span>
-        </div>
-        <div class="split" style="margin-top:0.4rem">
-          <div class="prose">
-            <ul>
-              <li><strong>SPI bring-up was the hard part.</strong> Getting the STM32 talking to the TMC429s took several days and came down to two bugs: one in my chip-interface code, and one where the controller's <strong>reset line was being held high</strong>, keeping the chips in reset. I found both on the oscilloscope, watching the actual bus.</li>
-              <li><strong>Six colors → four.</strong> The classifier computes hue for six colors, but in testing red, yellow, green, and blue separated most reliably — so the final demo committed to those four rather than chase noisy edge cases.</li>
-              <li><strong>24&nbsp;V → 12&nbsp;V.</strong> The board was designed to accept 24&nbsp;V, but testing showed 12&nbsp;V was plenty for the steppers; the switching regulator keeps wide-input headroom either way.</li>
-            </ul>
-          </div>
-          <figure class="figure">
-            <span class="figtag">Fig. 04 — SPI debug</span>
-            <img src="assets/img/robotic-arm/arm-scope.jpg" width="1300" height="975" loading="lazy"
-                 alt="Oscilloscope screen capturing a digital signal on the SPI bus during bring-up of the motion-control chips." />
-            <figcaption>Scope capture from the multi-day SPI bring-up to the TMC429 motion controllers.</figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <!-- ===== D · RESULTS ===== -->
-      <section class="section" aria-labelledby="d-h">
-        <div class="section-head">
-          <span class="section-num">D</span>
-          <h2 class="section-title" id="d-h">Results</h2>
-          <span class="section-rule" aria-hidden="true"></span>
-        </div>
-        <div class="prose">
-          <p>
-            The arm successfully demonstrated the full loop end to end — joystick-assisted block selection, color detection,
-            gripping, and autonomous sorting. Formal cycle-time and repeatability metrics weren't recorded, so I'm not going
-            to invent them; the demonstration and the design figures below are the honest evidence.
-          </p>
-        </div>
-
-        <table class="spec-table">
-          <thead><tr><th>Parameter</th><th>Value</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td>Degrees of freedom</td><td class="num">4.5</td><td>4 steppers + servo gripper</td></tr>
-            <tr><td>Peak joint torque</td><td class="num">203 N·cm</td><td>base joint; FoS 1.4–4.5 across joints</td></tr>
-            <tr><td>Microstepping</td><td class="num">32×</td><td>200 steps/rev base motors</td></tr>
-            <tr><td>Gearbox ratios (J1–J4)</td><td class="num">5 · 10 · 5 · 1</td><td>—</td></tr>
-            <tr><td>Link lengths</td><td class="num">153 / 121 / 121 / 150 mm</td><td>—</td></tr>
-            <tr><td>Controller</td><td class="num">STM32H7A3</td><td>8 MHz ext. crystal, custom PCB</td></tr>
-            <tr><td>Power</td><td class="num">12 V · 6 A</td><td>board tolerant to 24 V design</td></tr>
-          </tbody>
-        </table>
-
       </section>
 
       <!-- ===== E · NEXT ===== -->
       <section class="section" aria-labelledby="e-h">
         <div class="section-head">
           <span class="section-num">E</span>
-          <h2 class="section-title" id="e-h">What I'd build next</h2>
+          <h2 class="section-title" id="e-h">Next Steps</h2>
           <span class="section-rule" aria-hidden="true"></span>
         </div>
         <div class="prose">
           <ul>
-            <li><strong>Close the position loop.</strong> The joints run open-loop from a manual zero; adding homing switches (the PCB already reserves the inputs) would guarantee a repeatable origin every run.</li>
-            <li><strong>Measure it.</strong> Instrument sort success rate and cycle time so the "it works" claim becomes a number.</li>
-            <li><strong>Richer motion.</strong> With the ramping offloaded, there's MCU budget to coordinate joints into smoother blended paths rather than discrete waypoints.</li>
+            <li><strong>Close the position loop.</strong> The joints run open-loop from a manual zero; adding homing switches (the PCB already has the inputs) would guarantee a repeatable origin every run.</li>
+            <li><strong>Accurately measure performance.</strong> Quantify the sort success rate and cycle time. Optimize by adjusting color sensor interface parameters and path waypoints.</li>
+            <li><strong>Implement more powerful picking motions.</strong> With motor ramping offloaded, there's MCU budget to compute inverse kinematics to allow for task space control of the end effector. Ideally, the joystick would be able to command more complex motions for the arm to pick up blocks in a wider range of positions.</li>
           </ul>
         </div>
 

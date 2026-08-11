@@ -43,10 +43,9 @@
         <span class="eyebrow">Master's thesis · Solo · Cal Poly 2026</span>
         <h1>Computer-Vision Pose Estimation for Planar Mobile Robots</h1>
         <p class="lede">
-          An overhead fisheye camera gives a differential-drive robot absolute world-frame position — replacing
-          drift-prone dead reckoning. I built the pipeline end to end: fisheye calibration, ArUco detection, a
-          Perspective-<em>n</em>-Point solve, an original analytical world-coordinate derivation, and a
-          four-microcontroller wireless link that delivers the estimate to the robot — then validated it against ground truth.
+          An overhead fisheye camera gives a differential-drive robot its absolute world-frame position to augment
+          drift-prone dead reckoning pose estimation. I assembled the entire pipeline including fisheye camera lens calibration, ArUco marker detection, Perspective-<em>n</em>-Point solution, an original analytical camera-to-world-coordinate solution, and a
+          four-microcontroller wireless link that delivers the estimate to the robot. I then validated it against ground truth.
         </p>
         <dl class="spec-block">
           <div class="row"><dt>Role</dt><dd>Solo — design, build, test</dd></div>
@@ -58,7 +57,7 @@
           <span class="figtag">Fig. 01 — Test rig &amp; frames</span>
           <img src="assets/img/pose-estimation/coordinate-frames.png" width="721" height="710"
                alt="Lab setup: an overhead camera on a wooden stand (camera frame X-c) looks down at a marker-covered board on a table, with the world frame axes X-w, Y-w, Z-w drawn at one corner." />
-          <figcaption>The system maps a marker's position in the image to the world frame defined on the track. A single overhead camera covers the full ~36&nbsp;×&nbsp;72&nbsp;in workspace.</figcaption>
+          <figcaption>The system maps a marker's position in the image to the world frame defined by the track. A single overhead camera covers the full ~36&nbsp;×&nbsp;72&nbsp;in workspace.</figcaption>
         </figure>
 
         <div class="metrics" style="margin-top:2rem" aria-label="Headline results">
@@ -74,7 +73,7 @@
             <img src="assets/img/pose-estimation/yt-CT9yKjzfANE.jpg" width="480" height="360" loading="lazy" alt="Video thumbnail: the Romi robot tracked in real time by the overhead camera system." />
             <span class="play" aria-hidden="true"></span>
           </div>
-          <figcaption>Live demonstration of the robot tracked in real time.</figcaption>
+          <figcaption>Live demonstration of the robot being tracked in real time.</figcaption>
         </figure>
       </section>
 
@@ -87,14 +86,15 @@
         </div>
         <div class="prose">
           <p>
-            The "Romi" robots used in Cal Poly's mechatronics course navigate by dead reckoning — wheel odometry fused
-            with an IMU. That estimate drifts: wheels slip, and the magnetometer is disturbed by the motors and nearby
+            The "Romi" robots used in Cal Poly's mechatronics course navigate by using state estimation to fuse wheel odometry
+            with an IMU. This effectively uses dead reckoning to generate pose estimates. These estimates drift over time as
+            wheels slip and the magnetometer in the IMU is disturbed by motors and nearby
             metal. There was no external source of <strong>absolute</strong> position to correct it.
           </p>
           <p>
-            The goal was a low-cost, portable system that hands each robot its true pose in a fixed world frame, accurate
+            The goal for this project was to develop a low-cost, portable system that gives each robot its true pose in a fixed world frame, accurate
             enough for course maneuvers, fast enough for closed-loop use, and simple enough for students to set up and tear
-            down repeatedly. The design targets it had to answer to:
+            down repeatedly. The design targets were
           </p>
           <ul>
             <li><strong>±5&nbsp;mm</strong> accuracy at a <strong>≥10&nbsp;Hz</strong> update rate (inherited from a prior senior project)</li>
@@ -109,23 +109,21 @@
       <section class="section" aria-labelledby="b-h">
         <div class="section-head">
           <span class="section-num">B</span>
-          <h2 class="section-title" id="b-h">My approach &amp; the decisions</h2>
+          <h2 class="section-title" id="b-h">Overall approach &amp; design decisions</h2>
           <span class="section-rule" aria-hidden="true"></span>
           <span class="section-meta">Solo</span>
         </div>
         <div class="prose">
           <p>
-            This was a solo thesis, so every architecture choice was mine to make and defend. The system is deliberately
-            framed as a <strong>robotics-systems</strong> problem — localization, coordinate transforms, embedded
-            communication, and experimental validation — with computer vision as one subsystem inside it.
+            This was a solo thesis, so I made and defended every architecture choice.
           </p>
           <h3>Sensing &amp; math</h3>
           <ul>
-            <li><strong>External overhead camera</strong> over onboard-only sensing — an absolute reference can't drift.</li>
+            <li><strong>External overhead camera</strong> over onboard-only sensing</li>
             <li>A <strong>single fisheye camera</strong> (Raspberry&nbsp;Pi Camera Module&nbsp;3 Wide, 120° FOV) to cover the whole track from one mount, accepting lens distortion as the tradeoff.</li>
-            <li><strong>Kannala–Brandt fisheye calibration</strong> from ~40 checkerboard images to recover the intrinsics and distortion model.</li>
-            <li>Detect <strong>ArUco</strong> markers, then solve the Perspective-<em>n</em>-Point problem with the iterative (Levenberg–Marquardt) solver plus RANSAC to reject outliers from imperfect undistortion.</li>
-            <li>An <strong>original analytical derivation</strong> recovers a marker's world X/Y from a single PnP solution and its known height — so the system doesn't re-solve PnP for every estimate.</li>
+            <li><strong>Fisheye lens calibration</strong> from ~40 checkerboard images to estimate the camera's intrinsics and characterize lens distortion.</li>
+            <li>Detect <strong>ArUco</strong> markers, then solve the Perspective-<em>n</em>-Point problem using RANSAC to reject outliers from imperfect undistortion.</li>
+            <li>An <strong>original analytical derivation</strong> recovers a marker's world X and Y positions from a single PnP solution and its known height so that the system doesn't re-solve PnP for every estimate.</li>
           </ul>
         </div>
 
@@ -134,7 +132,7 @@
             <span class="figtag">Fig. 02 — Calibration</span>
             <img src="assets/img/pose-estimation/calibration-corners.jpg" width="1400" height="803" loading="lazy"
                  alt="Fisheye calibration board with every detected ArUco corner marked, used to solve the camera intrinsics and distortion." />
-            <figcaption>Detected marker corners across the board — the correspondences that drive calibration and the PnP solve.</figcaption>
+            <figcaption>Detected corners for markers placed at known locations. These correspondences drive calibration and the PnP solution.</figcaption>
           </figure>
           <div class="prose">
             <h3>Communication</h3>
@@ -149,9 +147,9 @@
               <div class="node"><span class="n-name">STM32</span><span class="n-sub">On robot</span></div>
             </div>
             <p style="margin-top:1rem">
-              <strong>ESP-NOW</strong> for its low, connectionless latency; <strong>UART</strong> into the robot because
-              it's already what the course teaches. The vision app is threaded Python on the Pi (picamera2 / libcamera / spidev);
-              the ESP32s run C under FreeRTOS with tasks, queues, and an event-group mutex.
+              I used <strong>ESP-NOW</strong> because it's connectionless and provides low latency wireless communication, and <strong>UART</strong> to the robot because
+              it's already taught in the course already. The vision application is deployed as a threaded Python script on the Pi (picamera2 / libcamera / spidev), and
+              the ESP32s run C using FreeRTOS.
             </p>
           </div>
         </div>
@@ -161,14 +159,14 @@
       <section class="section" aria-labelledby="c-h">
         <div class="section-head">
           <span class="section-num">C</span>
-          <h2 class="section-title" id="c-h">What I changed, and why</h2>
+          <h2 class="section-title" id="c-h">Obstacles and Solutions</h2>
           <span class="section-rule" aria-hidden="true"></span>
         </div>
         <div class="prose">
           <ul>
-            <li><strong>Regular lens → fisheye.</strong> I started with a standard lens, but to fit the whole table in frame it had to sit so high that the ArUco markers came out too low-resolution to detect reliably. Switching to a fisheye lens kept the entire table in view at usable resolution — trading lens distortion, which I could calibrate out, for the marker resolution I needed.</li>
-            <li><strong>Homography → analytical PnP.</strong> My first pixel-to-pose method was a homography, which assumes every marker lies in the same plane as the fixed corner markers. But the marker riding on the Romi sits higher than the floor markers, so that flat-world assumption produced systematically wrong poses — which motivated the current analytical, PnP-based transform that accounts for marker height.</li>
-            <li><strong>Fisheye calibration was finicky.</strong> OpenCV would reject one image, but which one it blamed depended on the rest of the set — so fixing one failure just surfaced another. I scripted the dataset selection to converge on a working set of 42 images. It's sufficient but not perfect: some residual distortion survives at the frame edges (I'm not convinced perfect fisheye calibration is even achievable), and that residual is the leading source of pose error.</li>
+            <li><strong>Regular lens → fisheye.</strong> I started with a standard lens camera, but in order to fit the whole table in the frame it had to sit so high that the ArUco markers came out too low-resolution to detect reliably. Switching to a fisheye lens kept the entire table in view at a usable resolution. This added lens distortion, which could be calibrated out, but gave the marker resolution needed.</li>
+            <li><strong>Homography → analytical PnP.</strong> My first pixel-to-pose method used homography and assumeed every marker lay in the same plane as the fixed calibration markers. But a marker mounted on a Romi sits higher than the floor markers, so that flat-world assumption produced systematically wrong poses. This motivated the current analytical, PnP-based transform that accounts for marker height above the plane of the table.</li>
+            <li><strong>Fisheye calibration was finicky.</strong> OpenCV fisheye lens characterization based on images of a calibration pattern would fail based on a specific image, but which one depended on the rest of the set. So, rejecting one bad image would just expose another. I wrote a script to automate the dataset selection process and converged on a working set of 42 images. The fisheye calibration is sufficient but not perfect. Some residual distortion is visible at the frame edges (I'm not convinced perfect fisheye calibration is even achievable), and that residual distortion is likely the leading source of pose error.</li>
           </ul>
         </div>
 
@@ -187,18 +185,19 @@
           </figure>
         </div>
 
-        <div class="note">
+
+      <!-- ===== D · RESULTS ===== -->
+
+      <div class="note">
           <span class="note-k">Candid finding</span>
           <p>
             Against a static robot, the vision estimate matched ground truth well. But on a <strong>moving</strong> robot the
-            estimate visibly diverged from odometry — traceable to end-to-end latency (the estimate lags the robot) compounded
-            by odometry drift. I documented it as a real limitation rather than smoothing it over, and it directly shapes the
+            estimate visibly diverged from odometry. I traced this back to end-to-end latency (the estimate lags the robot) compounded
+            by inaccuracies in the computer vision pipeline and odometry drift. I documented it as a limitation of this project and it directly shapes the
             "what's next" below.
           </p>
         </div>
       </section>
-
-      <!-- ===== D · RESULTS ===== -->
       <section class="section" aria-labelledby="d-h">
         <div class="section-head">
           <span class="section-num">D</span>
@@ -218,9 +217,9 @@
           <thead><tr><th>Metric</th><th>Result</th><th>Notes</th></tr></thead>
           <tbody>
             <tr><td>Accuracy — table plane (Z = 0)</td><td class="num">2.6 mm avg · 4.2 mm max</td><td>11 markers</td></tr>
-            <tr><td>Accuracy — robot height (Z = −130 mm)</td><td class="num">3.9 mm avg · 6.0 mm max</td><td>off-plane test</td></tr>
+            <tr><td>Accuracy — robot height (Z = −130 mm)</td><td class="num">3.9 mm avg · 6.0 mm max</td><td>7 markers</td></tr>
             <tr><td>Reprojection error</td><td class="num">2.75 px mean</td><td>±0.25 px run-to-run, 44 corners</td></tr>
-            <tr><td>Vision latency</td><td class="num">82 ms mean</td><td>73–168 ms; ArUco ≈70%, undistort ≈30%</td></tr>
+            <tr><td>Vision latency</td><td class="num">82 ms mean</td><td>73–168 ms; ArUco detection ≈70%, undistort image ≈30%</td></tr>
             <tr><td>Communication latency</td><td class="num">≈4.6 ms</td><td>SPI 6 MHz · ESP-NOW · UART 115200</td></tr>
             <tr><td>End-to-end</td><td class="num">≈87 ms</td><td>vision + comms</td></tr>
           </tbody>
@@ -259,14 +258,14 @@
           <span class="figtag">Fig. 08 — Deviation vs. time</span>
           <div class="plot-canvas"><img src="assets/diagrams/pose-estimation/difference-vs-time.svg" loading="lazy"
                alt="Difference between camera and odometry estimates plotted against time, growing roughly linearly with a fitted trend line." /></div>
-          <figcaption>Camera–odometry difference grows with time…</figcaption>
+          <figcaption>Camera–odometry difference appears to grow with time…</figcaption>
         </figure>
 
         <figure class="figure mid" style="margin-top:1rem">
           <span class="figtag">Fig. 09 — Deviation vs. velocity</span>
           <div class="plot-canvas"><img src="assets/diagrams/pose-estimation/difference-vs-velocity.svg" loading="lazy"
                alt="Difference between camera and odometry estimates plotted against robot velocity, increasing with speed." /></div>
-          <figcaption>…and with robot velocity — the latency signature.</figcaption>
+          <figcaption>…and with robot velocity, demonstrating the impact of latency.</figcaption>
         </figure>
       </section>
 
@@ -274,14 +273,15 @@
       <section class="section" aria-labelledby="e-h">
         <div class="section-head">
           <span class="section-num">E</span>
-          <h2 class="section-title" id="e-h">What I'd build next</h2>
+          <h2 class="section-title" id="e-h">Next Steps</h2>
           <span class="section-rule" aria-hidden="true"></span>
         </div>
         <div class="prose">
           <ul>
-            <li><strong>Cut the latency, in software and hardware.</strong> ArUco detection is ~70% of vision time — a smaller search region, lower-res detection pass, or a GPU/NEON path would help there. Image-capture latency, though, is floored by the camera's rolling shutter, which reads the sensor line-by-line at a fixed frame rate; a global-shutter camera and a faster Pi would lift that ceiling more than any code tuning.</li>
-            <li><strong>Compensate motion.</strong> A predictive filter (e.g. constant-velocity forward-projection or a small Kalman step) would counter the lag that shows up on moving robots.</li>
-            <li><strong>Handle corner distortion</strong> explicitly, since residual fisheye error at the edges is the dominant accuracy limit.</li>
+            <li><strong>Cut latency via hardware upgrades.</strong> ArUco detection is ~70% of computer vision computation time. A lower-resolution detection pass or additional computation power would help. Additionally, the camera's rolling shutter, which reads the sensor line-by-line at a fixed frame rate, and driver-level camera interface software constrain the image-capture latency. A global-shutter camera and a device with a more powerful processor would be the most effective way to help reduce latency from these sources more than additional code tuning.</li>
+            <li><strong>Remove corner distortion.</strong> Upgrade to a higher resolution, standard FoV camera so that it can mount high enough to capture the entire game track while retaining sufficient marker resolution for reliable detection.</li>
+            <li><strong>Compensate for motion.</strong> A predictive filter (e.g. constant-velocity forward-projection or a small Kalman step) would counter the lag that shows up on moving robots.</li>
+
           </ul>
           <p style="margin-top:1.4rem">
             <a class="btn" href="assets/docs/andrew-jones-thesis.pdf">Read the full thesis (PDF) <span class="arw" aria-hidden="true">→</span></a>
