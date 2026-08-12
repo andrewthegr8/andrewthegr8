@@ -50,4 +50,63 @@
       sync();
     });
   }
+
+  // Figure lightbox: click a figure image to view a larger, centered version
+  var overlay = null;
+  var lastFocus = null;
+
+  function closeLightbox() {
+    if (!overlay) return;
+    document.removeEventListener("keydown", onLightboxKey);
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    document.documentElement.style.overflow = "";
+    overlay = null;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  function onLightboxKey(e) {
+    if (e.key === "Escape" || e.key === "Esc") closeLightbox();
+  }
+
+  function openLightbox(src, alt) {
+    if (overlay) closeLightbox();
+    lastFocus = document.activeElement;
+
+    overlay = document.createElement("div");
+    overlay.className = "lightbox";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", alt ? "Enlarged figure: " + alt : "Enlarged figure");
+
+    var big = document.createElement("img");
+    big.className = "lightbox-img";
+    big.src = src;
+    big.alt = alt || "";
+    overlay.appendChild(big);
+
+    var close = document.createElement("button");
+    close.type = "button";
+    close.className = "lightbox-close";
+    close.setAttribute("aria-label", "Close");
+    close.innerHTML = "×"; // ×
+    overlay.appendChild(close);
+
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) closeLightbox(); // click the backdrop to dismiss
+    });
+    close.addEventListener("click", closeLightbox);
+    document.addEventListener("keydown", onLightboxKey);
+
+    document.body.appendChild(overlay);
+    document.documentElement.style.overflow = "hidden";
+    close.focus();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll(".figure img"), function (im) {
+    if (im.closest && im.closest(".video")) return; // leave video posters to the player
+    im.classList.add("zoomable");
+    im.addEventListener("click", function () {
+      openLightbox(im.currentSrc || im.src, im.getAttribute("alt") || "");
+    });
+  });
 })();

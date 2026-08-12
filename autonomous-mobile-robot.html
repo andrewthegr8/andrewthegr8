@@ -43,7 +43,7 @@
         <span class="eyebrow">ME 405 Mechatronics · Solo · Cal Poly</span>
         <h1>Autonomous Mobile Robot</h1>
         <p class="lede">
-          I programmed a Pololu Romi robot that completes an obstacle course on its own using line-following, odometry, and bump sensors to hit checkpoints and dodge obstacles as fast as possible. This was a solo project and incorporates a <strong>observer-based state estimator</strong> and a <strong>custom heading-and-speed control law</strong>. I tuned it to cut course completion time from ~30&nbsp;s down to ~11&nbsp;s and ended up being the
+          I programmed a Pololu Romi robot that completes an obstacle course on its own using line-following, odometry, and bump sensors to hit checkpoints and dodge obstacles as fast as possible. This was a solo project and incorporates an <strong>observer-based state estimator</strong> and a <strong>custom heading-and-speed control law</strong>. I tuned it to cut course completion time from ~30&nbsp;s down to ~11&nbsp;s and ended up being the
           fastest of twelve teams.
         </p>
         <dl class="spec-block">
@@ -127,7 +127,7 @@
           <div class="prose">
             <h3>Real-time firmware &amp; tooling</h3>
             <ul>
-              <li>MicroPython is a suboptimal programming language for real time control by was a course requirement. I compensated for some of its foibles by using the <strong><code>@micropython.native</code></strong> emitter, extensively pre-allocating buffers, and manually running its garbage-collector to manage heap memory.</li>
+              <li>MicroPython is a suboptimal programming language for real time control but was a course requirement. I compensated for some of its foibles by using the <strong><code>@micropython.native</code></strong> emitter, extensively pre-allocating buffers, and manually running its garbage-collector to manage heap memory.</li>
               <li>I built a full <strong>PC-side telemetry toolchain</strong> using Bluetooth to communicate with the robot. It uses custom binary packets, presents a live Tkinter dashboard, and allows for CSV export and auto-plotting of course run data.</li>
             </ul>
           </div>

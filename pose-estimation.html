@@ -148,7 +148,7 @@
             </div>
             <p style="margin-top:1rem">
               I used <strong>ESP-NOW</strong> because it's connectionless and provides low latency wireless communication, and <strong>UART</strong> to the robot because
-              it's already taught in the course already. The vision application is deployed as a threaded Python script on the Pi (picamera2 / libcamera / spidev), and
+              it's already taught in the course. The vision application is deployed as a threaded Python script on the Pi (picamera2 / libcamera / spidev), and
               the ESP32s run C using FreeRTOS.
             </p>
           </div>
@@ -165,7 +165,7 @@
         <div class="prose">
           <ul>
             <li><strong>Regular lens → fisheye.</strong> I started with a standard lens camera, but in order to fit the whole table in the frame it had to sit so high that the ArUco markers came out too low-resolution to detect reliably. Switching to a fisheye lens kept the entire table in view at a usable resolution. This added lens distortion, which could be calibrated out, but gave the marker resolution needed.</li>
-            <li><strong>Homography → analytical PnP.</strong> My first pixel-to-pose method used homography and assumeed every marker lay in the same plane as the fixed calibration markers. But a marker mounted on a Romi sits higher than the floor markers, so that flat-world assumption produced systematically wrong poses. This motivated the current analytical, PnP-based transform that accounts for marker height above the plane of the table.</li>
+            <li><strong>Homography → analytical PnP.</strong> My first pixel-to-pose method used homography and assumed every marker lay in the same plane as the fixed calibration markers. But a marker mounted on a Romi sits higher than the floor markers, so that flat-world assumption produced systematically wrong poses. This motivated the current analytical, PnP-based transform that accounts for marker height above the plane of the table.</li>
             <li><strong>Fisheye calibration was finicky.</strong> OpenCV fisheye lens characterization based on images of a calibration pattern would fail based on a specific image, but which one depended on the rest of the set. So, rejecting one bad image would just expose another. I wrote a script to automate the dataset selection process and converged on a working set of 42 images. The fisheye calibration is sufficient but not perfect. Some residual distortion is visible at the frame edges (I'm not convinced perfect fisheye calibration is even achievable), and that residual distortion is likely the leading source of pose error.</li>
           </ul>
         </div>
@@ -207,7 +207,7 @@
         </div>
         <div class="prose">
           <p>
-            Static accuracy came in at a few millimetres, and latency landed near the real-time budget. It did not quite hit
+            Static accuracy came in at a few millimeters, and latency landed near the real-time budget. It did not quite hit
             the aggressive ±5&nbsp;mm target, but the error is comfortably inside the ~±35&nbsp;mm tolerance of the tightest
             course maneuver — so the system is usable for its intended job.
           </p>
@@ -279,7 +279,7 @@
         <div class="prose">
           <ul>
             <li><strong>Cut latency via hardware upgrades.</strong> ArUco detection is ~70% of computer vision computation time. A lower-resolution detection pass or additional computation power would help. Additionally, the camera's rolling shutter, which reads the sensor line-by-line at a fixed frame rate, and driver-level camera interface software constrain the image-capture latency. A global-shutter camera and a device with a more powerful processor would be the most effective way to help reduce latency from these sources more than additional code tuning.</li>
-            <li><strong>Remove corner distortion.</strong> Upgrade to a higher resolution, standard FoV camera so that it can mount high enough to capture the entire game track while retaining sufficient marker resolution for reliable detection.</li>
+            <li><strong>Remove corner distortion.</strong> Upgrade to a higher resolution, standard FOV camera so that it can mount high enough to capture the entire game track while retaining sufficient marker resolution for reliable detection.</li>
             <li><strong>Compensate for motion.</strong> A predictive filter (e.g. constant-velocity forward-projection or a small Kalman step) would counter the lag that shows up on moving robots.</li>
 
           </ul>

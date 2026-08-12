@@ -213,6 +213,35 @@ p { margin: 0 0 1rem; }
   padding: 0.55rem 0.75rem; border-top: 1px solid var(--line); letter-spacing: 0.03em;
 }
 
+/* ---- Figure lightbox (click a figure to enlarge) -------------------------- */
+.zoomable { cursor: zoom-in; }
+.lightbox {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(1.4rem, 5vw, 3.5rem);
+  background: rgba(23, 33, 46, 0.82);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+.lightbox .lightbox-img {
+  max-width: 100%; max-height: 100%; width: auto; height: auto;
+  object-fit: contain;
+  background: #fff;   /* keeps transparent SVG plots legible */
+  cursor: default;
+}
+.lightbox-close {
+  position: fixed;
+  top: clamp(0.6rem, 2.2vw, 1.3rem);
+  right: clamp(0.6rem, 2.2vw, 1.3rem);
+  width: 2.5rem; height: 2.5rem;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 1.5rem; line-height: 1;
+  color: #fff; background: rgba(23, 33, 46, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
+}
+.lightbox-close:hover { background: var(--accent); border-color: var(--accent); }
+
 /* ---- Dimension / metric callouts ------------------------------------------ */
 .metrics { display: flex; flex-wrap: wrap; gap: clamp(1.2rem, 4vw, 2.4rem); }
 .metric { position: relative; padding-top: 0.6rem; border-top: 1px solid var(--line-2); min-width: 88px; }

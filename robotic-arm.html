@@ -43,7 +43,7 @@
         <span class="eyebrow">ME 507 Mechatronics · Team of 3 · Cal Poly</span>
         <h1>4.5-DOF Color-Sorting Robotic Arm</h1>
         <p class="lede">
-          A semi-autonomous roboticarm: you use the joystick to move the end effector over a foam block, then it takes over at the press of a button. It reads the
+          A semi-autonomous robotic arm: you use the joystick to move the end effector over a foam block, then it takes over at the press of a button. It reads the
           block's color and places it into the appropriate bin. It's powered by four stepper-driven joints and a servo gripper and run by a
           custom STM32 controller. <strong>I designed the motion subsystem and selected its electronics.</strong>
         </p>
@@ -76,9 +76,9 @@
         </div>
         <div class="prose">
           <p>
-            The ME 507 term project was to build a mechatronic device that interfaces with multiple sensors and actuators using a custom PCB
+            The ME 507 term project was to build a mechatronic device that interfaces with multiple sensors and actuators using a custom PCB.
             My team built a robotic arm that sorts foam blocks by color. It runs semi-autonomously; the operator
-            levels the arm and presses the joystick to zero the joints, drives the end effector over a block using a jostick, then presses a
+            levels the arm and presses the joystick to zero the joints, drives the end effector over a block using a joystick, then presses a
             button to hand off control to the arm. The arm reads the block's color with an end-effector sensor, closes the gripper,
             and moves the block to the appropriate bin for that color.
           </p>
@@ -124,7 +124,7 @@
           </ul>
           <h3>Motion firmware</h3>
           <ul>
-            <li>Wrote a <strong>TMC429 SPI driver</strong> facilitate the deployment of vendor provided drivers, a basic enable / safe-state control driver to interface with the stepper drivers, and a radians-to-steps command layer.</li>
+            <li>Wrote a <strong>TMC429 SPI driver</strong> to facilitate the deployment of vendor provided drivers, a basic enable / safe-state control driver to interface with the stepper drivers, and a radians-to-steps command layer.</li>
             <li>Built a <strong>trajectory / waypoint engine</strong>. Motions are declared as waypoint structs (per-joint targets plus gripper state), so adding a new path is a data change, not new control code.</li>
           </ul>
         </div>
@@ -189,24 +189,14 @@
           </p>
         </div>
 
-        <div class="figrow" style="margin-top:2.2rem">
-          <figure class="figure">
-            <span class="figtag">Demo — RGB sort</span>
-            <div class="video" data-yt="tl6NA75vG2Q" role="button" tabindex="0" aria-label="Play the RGB color-sorting demo video">
-              <img src="assets/img/robotic-arm/yt-xEQVzRaxtds.jpg" width="480" height="360" loading="lazy" alt="Video thumbnail: the robotic arm sorting colored blocks." />
-              <span class="play" aria-hidden="true"></span>
-            </div>
-            <figcaption>Color-sorting demonstration.</figcaption>
-          </figure>
-          <figure class="figure">
-            <span class="figtag">Demo — full run</span>
-            <div class="video" data-yt="d1UqmxpobEM" role="button" tabindex="0" aria-label="Play the full arm demonstration video">
-              <img src="assets/img/robotic-arm/yt-d1UqmxpobEM.jpg" width="480" height="360" loading="lazy" alt="Video thumbnail: the robotic arm during a full demonstration." />
-              <span class="play" aria-hidden="true"></span>
-            </div>
-            <figcaption>Full joystick-to-sort demonstration.</figcaption>
-          </figure>
-        </div>
+        <figure class="figure mid" style="margin-top:2.2rem">
+          <span class="figtag">Demo — RGB sort</span>
+          <div class="video" data-yt="tl6NA75vG2Q" role="button" tabindex="0" aria-label="Play the RGB color-sorting demo video">
+            <img src="assets/img/robotic-arm/yt-xEQVzRaxtds.jpg" width="480" height="360" loading="lazy" alt="Video thumbnail: the robotic arm sorting colored blocks." />
+            <span class="play" aria-hidden="true"></span>
+          </div>
+          <figcaption>Color-sorting demonstration.</figcaption>
+        </figure>
       </section>
 
       </section>

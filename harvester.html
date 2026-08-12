@@ -86,7 +86,7 @@
         </div>
         <div class="prose">
           <p>
-            A 3D printer sits idle between jobs until a human peels clears the print bed. Especially in a shared or
+            A 3D printer sits idle between jobs until a human clears the print bed. Especially in a shared or
             farm setup, that manual step can be the bottleneck. Our team built a robot to do it: remove the build plate, pop the
             print off into a collection bin, and replace the plate, so the next job can start without anyone there.
           </p>
@@ -117,7 +117,7 @@
             <li><strong>Cubic-spline trajectory generation</strong> per joint between waypoints, for smooth start-to-stop motion.</li>
             <li><strong>Per-motor PI / PID position control</strong> by reading encoders to implement closed loop control on each of the five motors.</li>
             <li><strong>8&nbsp;kHz hardware-timed PWM</strong> to the motor drivers via <code>pigpio</code>.</li>
-            <li><strong>Live telemetry display with CSV logging</strong> plus custom script exception handling to ensure controlles motor movements and a <code>CTRL_OVERRIDE</code> debug mode to allow the motors to be zeroed while still streaming data.</li>
+            <li><strong>Live telemetry display with CSV logging</strong> plus custom script exception handling to ensure controlled motor movements and a <code>CTRL_OVERRIDE</code> debug mode to allow the motors to be zeroed while still streaming data.</li>
           </ul>
         </div>
 
@@ -157,14 +157,14 @@
         <div class="split" style="margin-top:0.4rem">
           <div class="prose">
             <p>
-              I first drove the motors with <strong>software-timed PWM</strong> but the motors consistently preformed poorly
-              no matter how much I tried to tune the PID controllers. The plot show why. Because the Pi runs a full operating system, it
+              I first drove the motors with <strong>software-timed PWM</strong> but the motors consistently performed poorly
+              no matter how much I tried to tune the PID controllers. The plot shows why. Because the Pi runs a full operating system, it
               interrupts the control script unpredictably. The software-timed PWM was built on this inconsistent clock and never actually produces the duty cycle commanded by the controller.
             </p>
             <p>
               I confirmed the duty-cycle mismatch on an oscilloscope, then switched to <strong>pigpio's hardware-timed
               (DMA-based) PWM at 8&nbsp;kHz</strong>. With the duty-cycle waveform now independent of OS jitter, the commanded duty
-              cycle was actually output by the PI and tuning became repeatable.
+              cycle was actually output by the Pi and tuning became repeatable.
             </p>
           </div>
           <figure class="figure">
@@ -195,7 +195,7 @@
         <div class="prose">
           <p>
             With hardware-timed PWM in place, the robot reliably ran a deterministic <strong>21-waypoint</strong> harvest sequence.
-            As shown below, actual joint positions track the desired cubic-spline trajectories closely. The tuned controllers are (especially
+            As shown below, actual joint positions track the desired cubic-spline trajectories closely. The tuned controllers (especially
             on the prismatic joints) are
             overdamped and stable.
           </p>
