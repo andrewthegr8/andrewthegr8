@@ -43,14 +43,14 @@
         <span class="eyebrow">ME 423 Robotics · Team of 5 · Cal Poly</span>
         <h1>3-DOF Print-Harvesting Robot</h1>
         <p class="lede">
-          A fixed manipulator that clears finished prints off a 3D-printer bed so a print farm can run unattended — it grips
+          A robotic manipulator that clears finished prints off a 3D-printer bed so a print farm can run unattended. It grips
           the build plate, lifts and flips it, flexes it to pop the print into a bin, and returns the plate. I was the
-          <strong>programming lead</strong>: I built the entire embedded control stack that runs the five motors.
+          <strong>programming lead</strong> and built the entire embedded control stack that runs the five motors.
         </p>
         <dl class="spec-block">
-          <div class="row"><dt>My role</dt><dd>Programming lead — the full embedded control stack</dd></div>
+          <div class="row"><dt>My role</dt><dd>Programming lead</dd></div>
           <div class="row"><dt>Team</dt><dd>5 (teammates: kinematics, electrical, manufacturing, CAD)</dd></div>
-          <div class="row"><dt>Stack</dt><dd>Raspberry Pi · Python · pigpio · MD10C drivers</dd></div>
+          <div class="row"><dt>Stack</dt><dd>Raspberry Pi · Python · pigpio</dd></div>
         </dl>
 
         <figure class="figure proj-hero-fig" style="margin-top:2rem">
@@ -86,13 +86,13 @@
         </div>
         <div class="prose">
           <p>
-            A 3D printer sits idle between jobs until a human peels off the finished part and clears the bed. On a shared or
-            farm setup, that manual step is the bottleneck. Our team built a robot to do it: remove the build plate, pop the
-            print off into a collection bin, and replace the plate — so the next job can start without anyone there.
+            A 3D printer sits idle between jobs until a human peels clears the print bed. Especially in a shared or
+            farm setup, that manual step can be the bottleneck. Our team built a robot to do it: remove the build plate, pop the
+            print off into a collection bin, and replace the plate, so the next job can start without anyone there.
           </p>
           <p>
-            The mechanism is a fixed <strong>3-DOF manipulator</strong> — a horizontal prismatic joint, a vertical prismatic
-            joint, and a revolute wrist — with a spring-loaded gripper. Five DC gearmotors drive it: one horizontal, two
+            The mechanism is a fixed <strong>3.5-DOF manipulator</strong> with a horizontal prismatic joint, a vertical prismatic
+            joint, a revolute wrist joint, and a spring-loaded gripper. Five DC gearmotors drive it: one horizontal, two
             vertical, one wrist, and one gripper.
           </p>
         </div>
@@ -102,7 +102,7 @@
       <section class="section" aria-labelledby="b-h">
         <div class="section-head">
           <span class="section-num">B</span>
-          <h2 class="section-title" id="b-h">My role &amp; the decisions</h2>
+          <h2 class="section-title" id="b-h">My role &amp; design decisions</h2>
           <span class="section-rule" aria-hidden="true"></span>
           <span class="section-meta">Programming lead</span>
         </div>
@@ -110,13 +110,14 @@
           <p>
             On a five-person team I was the programming lead and wrote the <strong>entire embedded control program</strong>
             that runs on the Raspberry Pi. (Teammates owned the kinematics and trajectory analysis, the electrical and
-            purchasing work, manufacturing, and CAD.) My stack:
+            purchasing work, manufacturing, and CAD.)
+            I built
           </p>
           <ul>
             <li><strong>Cubic-spline trajectory generation</strong> per joint between waypoints, for smooth start-to-stop motion.</li>
-            <li><strong>Per-motor PI / PID position control</strong> reading the encoders and closing the loop on each of the five motors.</li>
-            <li><strong>8&nbsp;kHz hardware-timed PWM</strong> to the MD10C drivers via <code>pigpio</code>.</li>
-            <li><strong>Live telemetry + CSV logging</strong>, plus signal-handled safe shutdown and a <code>CTRL_OVERRIDE</code> debug mode that zeros the motors while still streaming data.</li>
+            <li><strong>Per-motor PI / PID position control</strong> by reading encoders to implement closed loop control on each of the five motors.</li>
+            <li><strong>8&nbsp;kHz hardware-timed PWM</strong> to the motor drivers via <code>pigpio</code>.</li>
+            <li><strong>Live telemetry display with CSV logging</strong> plus custom script exception handling to ensure controlles motor movements and a <code>CTRL_OVERRIDE</code> debug mode to allow the motors to be zeroed while still streaming data.</li>
           </ul>
         </div>
 
@@ -137,9 +138,10 @@
         <div class="note" style="margin-top:1.6rem">
           <span class="note-k">Engineering around the platform</span>
           <p>
-            The Pi is not a real-time controller, so I designed around it: I round the position error before the integral
+            The Pi is not a real-time controller, so I designed around it. The position error is rounded before the integral
             term so it can actually reach zero given finite encoder resolution, and I measure the <strong>real elapsed time
-            per encoder read</strong> instead of assuming a fixed sample period. Those two choices keep the loop stable on a
+            per encoder read</strong> instead of assuming a fixed sample period. Those two choices help keep the motor control loops
+            stable on a
             general-purpose OS.
           </p>
         </div>
@@ -149,22 +151,20 @@
       <section class="section" aria-labelledby="c-h">
         <div class="section-head">
           <span class="section-num">C</span>
-          <h2 class="section-title" id="c-h">The debugging story — timing</h2>
+          <h2 class="section-title" id="c-h">Debugging story — timing</h2>
           <span class="section-rule" aria-hidden="true"></span>
         </div>
         <div class="split" style="margin-top:0.4rem">
           <div class="prose">
             <p>
-              I first drove the motors with <strong>software-timed PWM</strong>. The motors misbehaved in a way that no
-              amount of gain-tuning could fix. The reason is in the plot: because the Pi runs a full operating system, it
-              interrupts the control script unpredictably, so the loop period swings between about 8 and 14&nbsp;ms instead of
-              holding steady — and a software-timed PWM built on that jittering clock never produces the duty cycle you asked
-              for.
+              I first drove the motors with <strong>software-timed PWM</strong> but the motors consistently preformed poorly
+              no matter how much I tried to tune the PID controllers. The plot show why. Because the Pi runs a full operating system, it
+              interrupts the control script unpredictably. The software-timed PWM was built on this inconsistent clock and never actually produces the duty cycle commanded by the controller.
             </p>
             <p>
               I confirmed the duty-cycle mismatch on an oscilloscope, then switched to <strong>pigpio's hardware-timed
-              (DMA-based) PWM at 8&nbsp;kHz</strong>. With the waveform now independent of the OS jitter, the commanded duty
-              cycle actually reached the motors and tuning became repeatable.
+              (DMA-based) PWM at 8&nbsp;kHz</strong>. With the duty-cycle waveform now independent of OS jitter, the commanded duty
+              cycle was actually output by the PI and tuning became repeatable.
             </p>
           </div>
           <figure class="figure">
@@ -180,7 +180,7 @@
           <p>
             Software-timed PWM → <strong>hardware-timed (DMA) PWM via pigpio</strong>. The root cause was the Pi's
             non-real-time scheduling; moving the waveform generation off the CPU made the actual duty cycle match the command
-            and turned an untunable system into a controllable one.
+            and turned an unstable system into a controllable one.
           </p>
         </div>
       </section>
@@ -194,18 +194,18 @@
         </div>
         <div class="prose">
           <p>
-            With hardware-timed PWM in place, the robot ran a deterministic <strong>21-waypoint</strong> harvest sequence.
-            Actual joint positions track the desired cubic-spline trajectories closely — the tuned controllers are
-            overdamped and stable. Formal tracking-error numbers weren't recorded, so the plots are the honest evidence
-            rather than a headline RMS figure.
+            With hardware-timed PWM in place, the robot reliably ran a deterministic <strong>21-waypoint</strong> harvest sequence.
+            As shown below, actual joint positions track the desired cubic-spline trajectories closely. The tuned controllers are (especially
+            on the prismatic joints) are
+            overdamped and stable.
           </p>
         </div>
 
         <table class="spec-table">
           <thead><tr><th>Parameter</th><th>Value</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr><td>Actuators</td><td class="num">5 DC gearmotors</td><td>Pololu 37D 50:1, 3200 ticks/rev</td></tr>
-            <tr><td>Motor drivers</td><td class="num">MD10C</td><td>12 V, 13 A continuous</td></tr>
+            <tr><td>Actuators</td><td class="num">5 DC gearmotors w/ encoders</td><td>Pololu 37D 50:1, 3200 ticks/rev</td></tr>
+            <tr><td>Motor drivers</td><td class="num">MD10C</td><td>12 V, 10 A continuous</td></tr>
             <tr><td>PWM</td><td class="num">8 kHz, hardware-timed</td><td>pigpio (DMA)</td></tr>
             <tr><td>Target loop rate</td><td class="num">~200 Hz</td><td>variable in practice (non-RTOS)</td></tr>
             <tr><td>Sequence</td><td class="num">21 waypoints</td><td>grip → lift → flip → flex → release → return</td></tr>
@@ -237,10 +237,8 @@
         </div>
         <div class="prose">
           <ul>
-            <li><strong>Move motor timing to a real-time MCU.</strong> The whole PWM saga is a symptom of running control on a non-real-time OS; an STM32/RTOS handling the low-level loops would make timing deterministic by construction.</li>
-            <li><strong>Split the layers.</strong> Separate high-level sequencing (what to do next) from low-level control (hold this position) so each can be reasoned about — and swapped — independently.</li>
-            <li><strong>Add fault detection.</strong> Watch for stalled motors and missed encoder counts, and add homing switches and travel limits, to make it safe to leave running as a real printer-farm cell.</li>
-            <li><strong>Measure it.</strong> Log cycle time and tracking error so "it works" becomes a number.</li>
+            <li><strong>Move motor timing to a real-time MCU.</strong> The whole PWM saga is a symptom of running a real-time control loop on a non-real-time OS; a RTOS handling the low-level loops would make timing deterministic by construction.</li>
+            <li><strong>Add more safety features.</strong> Add homing switches and travel limits to make it safe to leave running as a real printer-farm cell.</li>
           </ul>
         </div>
 

@@ -221,7 +221,7 @@
         <div class="prose">
           <ul>
             <li><strong>Close the position loop.</strong> The joints run open-loop from a manual zero; adding homing switches (the PCB already has the inputs) would guarantee a repeatable origin every run.</li>
-            <li><strong>Accurately measure performance.</strong> Quantify the sort success rate and cycle time. Optimize by adjusting color sensor interface parameters and path waypoints.</li>
+            <li><strong>Optimize place paths.</strong> Dynamically compute path to a target bin from the end effector's current position rather than returning home and using a fixed path.</li>
             <li><strong>Implement more powerful picking motions.</strong> With motor ramping offloaded, there's MCU budget to compute inverse kinematics to allow for task space control of the end effector. Ideally, the joystick would be able to command more complex motions for the arm to pick up blocks in a wider range of positions.</li>
           </ul>
         </div>

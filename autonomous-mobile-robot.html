@@ -43,13 +43,11 @@
         <span class="eyebrow">ME 405 Mechatronics · Solo · Cal Poly</span>
         <h1>Autonomous Mobile Robot</h1>
         <p class="lede">
-          A Pololu Romi robot that drives an obstacle course on its own — line-following, hitting checkpoints, and dodging
-          a wall — as fast as possible. I built it solo around an <strong>observer-based state estimator</strong> and a
-          <strong>custom heading-and-speed control law</strong>, then tuned it from ~30&nbsp;s down to ~11&nbsp;s: the
+          I programmed a Pololu Romi robot that completes an obstacle course on its own using line-following, odometry, and bump sensors to hit checkpoints and dodge obstacles as fast as possible. This was a solo project and incorporates a <strong>observer-based state estimator</strong> and a <strong>custom heading-and-speed control law</strong>. I tuned it to cut course completion time from ~30&nbsp;s down to ~11&nbsp;s and ended up being the
           fastest of twelve teams.
         </p>
         <dl class="spec-block">
-          <div class="row"><dt>Role</dt><dd>Solo — firmware, estimation, control, tooling</dd></div>
+          <div class="row"><dt>Role</dt><dd>Solo project</dd></div>
           <div class="row"><dt>Focus</dt><dd>State estimation · Real-time control · Telemetry</dd></div>
           <div class="row"><dt>Stack</dt><dd>MicroPython · STM32L476 · IMU · Bluetooth</dd></div>
         </dl>
@@ -87,10 +85,10 @@
         </div>
         <div class="prose">
           <p>
-            The ME 405 term project puts a low-cost <strong>Pololu Romi</strong> (STM32L476 Nucleo, MicroPython) through an
-            obstacle course: follow a line to a junction, then drive a sequence of checkpoints while avoiding obstacles and a
-            wall. The single metric that matters is <strong>completion time</strong> — so the whole design question is how to
-            know where the robot is, accurately and cheaply, and drive it hard without losing control.
+            The term project for the ME 405 class at Cal Poly is to program a low-cost <strong>Pololu Romi</strong> controlled by an <strong>STM32L476 Nucleo</strong> running <strong>MicroPython</strong>
+            to autonomously complete an obstacle course. It must follow a line to a junction, then hit a sequence of checkpoints while avoiding obstacles and contacting a
+            wall. The metric that matters most is full course <strong>completion time</strong> so the primary design question is how to
+            know where the robot is and drive it quickly without losing control.
           </p>
         </div>
       </section>
@@ -99,24 +97,23 @@
       <section class="section" aria-labelledby="b-h">
         <div class="section-head">
           <span class="section-num">B</span>
-          <h2 class="section-title" id="b-h">My approach &amp; the decisions</h2>
+          <h2 class="section-title" id="b-h">Overall approach &amp; design decisions</h2>
           <span class="section-rule" aria-hidden="true"></span>
           <span class="section-meta">Solo</span>
         </div>
         <div class="prose">
           <h3>State estimation</h3>
           <p>
-            The core is an <strong>observer-based state estimator</strong> — a seven-state model (wheel velocities, heading,
-            wheel positions, and X/Y) built on a first-order motor model. I ran it in <strong>scalar form with RK4</strong>
-            integration rather than matrix operations, specifically to fit the STM32's small RAM and hold the real-time
-            budget. Because the model takes motor voltage as an input, I chose LiPo AA cells with built-in regulators for a
-            stable supply — a hardware choice made to serve the estimator.
+            Romi's pose is estimated in real time using an <strong>observer-based state estimator</strong>. It runs by solving a state-space model (wheel velocities, heading,
+            wheel positions, and robot X/Y position) built on a first-order motor model using RK4
+            integration. The model incorporates sensor feedback from the wheel encoders and IMU to return robust estimates of the robot's state. Because the model takes motor voltage as an input, I chose LiPo AA cells with built-in regulators for a
+            stable power supply over standard alkaline batteries.
           </p>
           <h3>Control law</h3>
           <p>
-            I wrote a <strong>custom heading-and-speed control law</strong> instead of using textbook Pure Pursuit (and wrote
-            up the tradeoffs). Heading error comes from the dot and cross products between the heading vector and the vector
-            to the target; the robot slows for large heading errors and as it nears a waypoint, so it doesn't overshoot.
+            I wrote a <strong>custom heading-and-speed control law</strong> instead of using a more classic Pure Pursuit approach.
+            Heading error is computed from the dot and cross products between the vector representing the heading of the robot and the vector from the robot
+            to the target. This drives the rotational and linear velocities of the robot. The robot rotates so that it points at a target point and slows for large heading errors and as it approaches a waypoint, so it doesn't overshoot.
           </p>
         </div>
 
@@ -130,8 +127,8 @@
           <div class="prose">
             <h3>Real-time firmware &amp; tooling</h3>
             <ul>
-              <li>Tightened the hot path with <strong><code>@micropython.native</code></strong> methods, pre-allocated buffers passed through the task share, and a dedicated garbage-collector task run once per loop.</li>
-              <li>Built a full <strong>PC-side telemetry toolchain</strong> over Bluetooth — a custom binary packet, a live Tkinter dashboard, CSV export, and an auto-plotting engine for run analysis.</li>
+              <li>MicroPython is a suboptimal programming language for real time control by was a course requirement. I compensated for some of its foibles by using the <strong><code>@micropython.native</code></strong> emitter, extensively pre-allocating buffers, and manually running its garbage-collector to manage heap memory.</li>
+              <li>I built a full <strong>PC-side telemetry toolchain</strong> using Bluetooth to communicate with the robot. It uses custom binary packets, presents a live Tkinter dashboard, and allows for CSV export and auto-plotting of course run data.</li>
             </ul>
           </div>
         </div>
@@ -148,15 +145,15 @@
       <section class="section" aria-labelledby="c-h">
         <div class="section-head">
           <span class="section-num">C</span>
-          <h2 class="section-title" id="c-h">What I changed, and why</h2>
+          <h2 class="section-title" id="c-h">Obstacles and solutions</h2>
           <span class="section-rule" aria-hidden="true"></span>
         </div>
         <div class="prose">
           <ul>
-            <li><strong>Constant speed didn't work.</strong> At a fixed speed the robot overshot waypoints and backtracked, especially on tight turns. I added speed modulation by heading accuracy and distance-to-target — the biggest single time saver.</li>
-            <li><strong>The IMU lied near the wall.</strong> Close to the metal wall the magnetometer gave nonsense headings, and with the observer's aggressive gains the estimate blew up. I disabled IMU feedback in that zone (heading from wheel velocity alone), then re-enabled it once the BNO055's self-calibration settled across runs.</li>
-            <li><strong>Bluetooth corruption showed up as spikes.</strong> Dropped/garbled packets put spikes in the plots, so I added a median-absolute-deviation outlier filter in the analysis engine.</li>
-            <li><strong>Loop timing.</strong> Trial and error put the smallest reliable task period at <strong>25&nbsp;ms</strong>; I raised it to 30&nbsp;ms for the final demo so unoptimized code wouldn't jitter the timestep.</li>
+            <li><strong>Constant speed didn't work.</strong> With a fixed linear velocity, the robot would overshoot waypoints and try to backtrack, especially on tight turns. This was fixed by adding speed modulation based on heading accuracy and distance-to-target.</li>
+            <li><strong>The IMU malfunctioned near the wall.</strong> Close to the metal wall the IMU's magnetometer gave nonsense headings. Since the IMU's heading is used as feedback for the observer, the estimated heading quickly degraded. To fix this, I disabled IMU feedback near the wall (computing heading from wheel velocity alone), and then re-enabled it after the BNO055's self-calibration fixed the interference issue.</li>
+            <li><strong>Bluetooth corruption showed up as spikes when plotting data from the robot.</strong> Bluetooth packets would randomly be corrupted and cause very large (or small) floating point numbers which would ruin plots. This was fixed by adding a median-absolute-deviation outlier filter in the plotting engine.</li>
+            <li><strong>Loop timing.</strong> Trial and error put the smallest reliable task period at <strong>25&nbsp;ms</strong>; I raised it to 30&nbsp;ms for the final demo so unoptimized code wouldn't cause jitter in the control loop's timestep.</li>
           </ul>
         </div>
 
@@ -168,7 +165,7 @@
             <figcaption>Heading goes nonsensical near the wall…</figcaption>
           </figure>
           <figure class="figure">
-            <span class="figtag">Fig. 05 — IMU disabled there</span>
+            <span class="figtag">Fig. 05 — IMU disabled</span>
             <div class="plot-canvas"><img src="assets/img/autonomous-mobile-robot/imu-off.png" width="1000" height="592" loading="lazy"
                  alt="Plot showing the observer heading behaving when IMU feedback is disabled in the wall zone." /></div>
             <figcaption>…so I lean on wheel-derived heading in that zone.</figcaption>
@@ -186,9 +183,9 @@
         </div>
         <div class="prose">
           <p>
-            Iterative tuning against real run data pulled course time from roughly 30&nbsp;seconds to about
+            Iterative tuning using real run data pulled course time from roughly 30&nbsp;seconds to about
             <strong>11&nbsp;seconds — the fastest of the twelve teams</strong>. The estimator's predicted velocities and
-            heading track the measured signals closely, which is what made driving that aggressively survivable.
+            heading track the measured signals closely, which is what made driving that aggressively feasible.
           </p>
         </div>
 
@@ -197,7 +194,7 @@
           <tbody>
             <tr><td>Course completion time</td><td class="num">~30 s → ~11 s</td><td>fastest of 12 teams</td></tr>
             <tr><td>Control loop period</td><td class="num">25 ms → 30 ms</td><td>min reliable → final demo</td></tr>
-            <tr><td>Observer</td><td class="num">7 states · 5 meas · 2 in</td><td>RK4, scalar form</td></tr>
+            <tr><td>Observer</td><td class="num">7 states (5 w/ feedback)</td><td>RK4, scalar form</td></tr>
             <tr><td>Telemetry link</td><td class="num">460800 baud</td><td>19-field binary packet</td></tr>
           </tbody>
         </table>
@@ -235,9 +232,8 @@
         </div>
         <div class="prose">
           <ul>
-            <li><strong>System-ID the motor model.</strong> Its parameters came from theory plus basic testing; a proper identification would sharpen the estimator and let me push gains further with less risk.</li>
-            <li><strong>Simplify the control law.</strong> The final law works but grew complex under time pressure — I'd re-derive a cleaner version now that I know which terms actually earn their keep.</li>
-            <li><strong>Fuse the IMU properly</strong> near the wall instead of switching it off — a confidence-weighted update would keep the heading correction where it's trustworthy.</li>
+            <li><strong>Do system characterization to tune the motor model.</strong> Its parameters came from theory plus basic testing. Proper motor characterization would sharpen the estimator and let me push sensor feedback gains further with less risk.</li>
+            <li><strong>Simplify the control law.</strong> The final heading-speed control equation works but grew complex as I ran out of time before the demo. I'd re-derive a cleaner version now that I know which parameters are actually useful.</li>
           </ul>
           <p style="margin-top:1.4rem">
             <a class="btn" href="https://term-project-me-405.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer">Full project documentation <span class="arw" aria-hidden="true">→</span></a>
